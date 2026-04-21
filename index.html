@@ -2940,6 +2940,7 @@ function saveEditProd(){
         });
         if(mostrarP&&price)window._fbdb.ref('precos/'+_epId).set(price);
       } else {
+        // Se não tem foto, remove do catálogo (Firebase)
         window._fbdb.ref('produtos_custom/'+_epId).remove();
       }
     }
