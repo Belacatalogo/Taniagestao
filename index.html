@@ -479,6 +479,31 @@ input,select{font-family:'Montserrat',sans-serif}
 <div id="tab-config" class="tab-page">
 
   <div class="cfg-section">
+    <div class="cfg-section-title">IA — Análise de Foto</div>
+    <div class="cfg-card">
+      <div class="cfg-card-title">🔑 Chave da API Gemini (Google)</div>
+      <div class="cfg-card-desc">
+        Cole aqui sua chave da API do Google Gemini para ativar a análise automática de fotos de produtos. A chave fica salva <strong style="color:#e8c97a;">só no seu celular</strong> e nunca vai para o GitHub ou internet.<br><br>
+        Para obter gratuitamente: acesse <strong style="color:#e8c97a;">aistudio.google.com</strong> → Get API Key → Create API Key.
+      </div>
+      <div style="position:relative;margin-bottom:8px;">
+        <input id="cfg-gemini-key-input" class="modal-input" type="password"
+          placeholder="Cole sua chave aqui: AIzaSy..."
+          style="padding-right:44px;font-size:0.7rem;"
+          oninput="cfgGeminiKeyChanged()">
+        <button onclick="toggleGeminiKeyVisibility()" id="cfg-gemini-eye"
+          style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(240,232,220,0.3);font-size:1rem;cursor:pointer;padding:4px;">👁</button>
+      </div>
+      <div id="cfg-gemini-status" style="font-size:0.48rem;letter-spacing:0.14em;color:rgba(240,232,220,0.3);margin-bottom:8px;min-height:14px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button class="cfg-btn cfg-btn-gold" style="flex:1;margin:0;" onclick="salvarChaveGemini()">💾 Salvar chave</button>
+        <button class="cfg-btn cfg-btn-green" style="width:auto;padding:10px 14px;margin:0;" onclick="testarChaveGemini()" title="Testar">🔍 Testar</button>
+        <button class="cfg-btn cfg-btn-red" style="width:auto;padding:10px 14px;margin:0;" onclick="apagarChaveGemini()" title="Apagar chave">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cfg-section">
     <div class="cfg-section-title">Configurações do Catálogo</div>
 
     <div class="cfg-card">
@@ -648,6 +673,30 @@ input,select{font-family:'Montserrat',sans-serif}
     <div class="modal-handle"></div>
     <div class="modal-title">Novo Produto</div>
     <div class="modal-sub">Preencha as informações</div>
+
+    <!-- FOTO PRIMEIRO + botão IA -->
+    <div class="modal-field">
+      <div class="modal-field-lbl">URL da Foto <span style="color:rgba(240,232,220,0.25);font-size:0.4rem;"> — cole o link do imgbb</span></div>
+      <input id="ap-foto" class="modal-input" type="url" placeholder="https://i.ibb.co/...">
+      <div id="ap-foto-preview" style="margin-top:8px;display:none;align-items:flex-start;gap:10px;">
+        <img id="ap-foto-img" src="" alt="Preview" style="width:80px;height:80px;object-fit:cover;border-radius:5px;border:1px solid rgba(201,168,76,0.3);flex-shrink:0;">
+        <div style="flex:1;">
+          <input id="ap-ai-dica" class="modal-input" type="text"
+            placeholder="Dica (opcional): ex: kit c/ hidratante baunilha + body splash"
+            style="font-size:0.62rem;padding:7px 10px;margin-bottom:6px;border-color:rgba(201,168,76,0.18);color:rgba(240,232,220,0.6);">
+          <button type="button" id="ap-ai-btn" onclick="analisarFotoIA()" style="width:100%;padding:9px 12px;background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.08));border:1px solid rgba(201,168,76,0.4);border-radius:6px;color:#e8c97a;font-size:0.55rem;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.2s;">
+            <span id="ap-ai-icon">✦</span> <span id="ap-ai-txt">Analisar com IA</span>
+          </button>
+          <div id="ap-ai-status" style="font-size:0.46rem;letter-spacing:0.14em;color:rgba(201,168,76,0.5);text-align:center;margin-top:5px;display:none;"></div>
+        </div>
+      </div>
+      <div style="margin-top:7px;display:flex;align-items:center;gap:8px;">
+        <input type="file" id="ap-foto-file" accept="image/*" style="display:none" onchange="handleApFotoUpload(this)">
+        <button type="button" onclick="document.getElementById('ap-foto-file').click()" style="padding:7px 12px;background:rgba(255,255,255,0.04);border:1px dashed rgba(201,168,76,0.2);border-radius:6px;color:rgba(240,232,220,0.35);font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;white-space:nowrap;">📷 Usar foto do celular</button>
+        <span style="font-size:0.44rem;color:rgba(240,232,220,0.2);letter-spacing:0.1em;">a IA também analisa</span>
+      </div>
+    </div>
+
     <div class="modal-field">
       <div class="modal-field-lbl">Nome *</div>
       <input id="ap-name" class="modal-input" type="text" placeholder="Ex: Glamour Secret Black">
@@ -668,12 +717,7 @@ input,select{font-family:'Montserrat',sans-serif}
       </div>
     </div>
     <div class="modal-field">
-      <div class="modal-field-lbl">URL da Foto <span style="color:rgba(240,232,220,0.25);font-size:0.4rem;"> — cole o link do imgbb</span></div>
-      <input id="ap-foto" class="modal-input" type="url" placeholder="https://i.ibb.co/...">
-      <div id="ap-foto-preview" style="margin-top:6px;display:none;"><img id="ap-foto-img" src="" alt="Preview" style="width:80px;height:80px;object-fit:cover;border-radius:5px;border:1px solid rgba(201,168,76,0.3);"></div>
-    </div>
-    <div class="modal-field">
-      <div class="modal-field-lbl">Categoria (Gestão)</div>
+      <div class="modal-field-lbl">Categoria (Gestão) <span style="color:rgba(240,232,220,0.2);font-size:0.38rem;letter-spacing:0.1em;">— pode selecionar várias</span> <span id="ap-cat-lbl" style="color:#C9A84C;font-size:0.42rem;"></span></div>
       <div class="parc-sel" id="ap-cat-sel" style="flex-wrap:wrap;gap:5px;"></div>
     </div>
     <div class="modal-field">
@@ -718,7 +762,7 @@ input,select{font-family:'Montserrat',sans-serif}
       <div id="ep-foto-preview" style="margin-top:6px;display:none;"><img id="ep-foto-img" src="" alt="Preview" style="width:80px;height:80px;object-fit:cover;border-radius:5px;border:1px solid rgba(201,168,76,0.3);"></div>
     </div>
     <div class="modal-field">
-      <div class="modal-field-lbl">Categoria (Gestão)</div>
+      <div class="modal-field-lbl">Categoria (Gestão) <span style="color:rgba(240,232,220,0.2);font-size:0.38rem;letter-spacing:0.1em;">— pode selecionar várias</span> <span id="ep-cat-lbl" style="color:#C9A84C;font-size:0.42rem;"></span></div>
       <div class="parc-sel" id="ep-cat-sel" style="flex-wrap:wrap;gap:5px;"></div>
     </div>
     <div class="modal-field">
@@ -731,6 +775,26 @@ input,select{font-family:'Montserrat',sans-serif}
     <div class="modal-btns">
       <button class="modal-btn-cancel" onclick="closeEditProdModal()">Cancelar</button>
       <button class="modal-btn-save" onclick="saveEditProd()">Salvar & Publicar</button>
+    </div>
+    <div style="margin-top:10px;">
+      <button type="button" onclick="confirmarApagarProduto()" style="width:100%;padding:11px;border-radius:6px;background:rgba(200,60,60,0.08);border:1px solid rgba(200,60,60,0.22);color:rgba(220,100,100,0.7);font-size:0.56rem;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;" ontouchstart="this.style.background='rgba(200,60,60,0.16)'" ontouchend="this.style.background='rgba(200,60,60,0.08)'">🗑 Apagar produto do catálogo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRMAR APAGAR PRODUTO -->
+<div id="modal-confirm-del" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-sheet" style="max-width:360px;margin:0 auto;">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:rgba(220,100,100,0.85);">Apagar produto?</div>
+    <div class="modal-sub" id="confirm-del-name" style="color:rgba(240,232,220,0.5);margin-bottom:14px;font-size:0.6rem;"></div>
+    <div style="background:rgba(200,60,60,0.07);border:1px solid rgba(200,60,60,0.2);border-radius:7px;padding:12px;font-size:0.55rem;letter-spacing:0.08em;color:rgba(240,232,220,0.5);line-height:1.6;margin-bottom:18px;">
+      ⚠ O produto será removido do catálogo e do Firebase.<br>
+      As <strong style="color:rgba(240,232,220,0.7);">vendas registradas não serão apagadas.</strong>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="document.getElementById('modal-confirm-del').classList.remove('open')">Cancelar</button>
+      <button style="flex:1;padding:13px;border-radius:6px;background:rgba(200,60,60,0.18);border:1px solid rgba(200,60,60,0.35);color:rgba(220,100,100,0.9);font-size:0.6rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;" onclick="executarApagarProduto()">Apagar</button>
     </div>
   </div>
 </div>
@@ -1618,6 +1682,8 @@ function sincronizarProdutos(){
 function renderConfig(){
   // preços toggle
   renderConfigPrecos();
+  // chave gemini
+  carregarChaveGeminiNaUI();
   // info
   var nVendas=0;
   Object.values(S.sales||{}).forEach(function(arr){nVendas+=arr.length;});
@@ -2345,8 +2411,9 @@ function renderCobrancas(){
 }
 
 // ── PRODUTOS CUSTOMIZADOS ─────────────────────────────────────────────────────
-var _apCat='feminino';
+var _apCats=['feminino'];
 var _apAba='todos';
+var _apFotoBase64 = null;
 
 var ABAS_CATALOGO=[
   {id:'todos',      label:'Todos'},
@@ -2419,24 +2486,32 @@ function removeCustomProd(id){
 }
 
 function openAddProdModal(){
-  _apCat='feminino';
+  _apCats=['feminino'];
   _apAba='todos';
+  _apFotoBase64=null;
   document.getElementById('ap-name').value='';
   document.getElementById('ap-brand').value='';
   document.getElementById('ap-sub').value='';
   document.getElementById('ap-price').value='';
   document.getElementById('ap-foto').value='';
+  document.getElementById('ap-foto').placeholder='https://i.ibb.co/...';
   document.getElementById('ap-foto-preview').style.display='none';
+  var aiBtn=document.getElementById('ap-ai-btn');
+  if(aiBtn){aiBtn.style.background='';aiBtn.style.borderColor='';aiBtn.style.color='#e8c97a';}
+  var aiIcon=document.getElementById('ap-ai-icon');if(aiIcon)aiIcon.textContent='✦';
+  var aiTxt=document.getElementById('ap-ai-txt');if(aiTxt)aiTxt.textContent='Analisar com IA';
+  var aiStatus=document.getElementById('ap-ai-status');if(aiStatus)aiStatus.style.display='none';
+  var fi=document.getElementById('ap-foto-file');if(fi)fi.value='';
+  var dica=document.getElementById('ap-ai-dica');if(dica)dica.value='';
   renderApCats();
   renderApAbas();
   document.getElementById('modal-add-prod').classList.add('open');
-  setTimeout(function(){document.getElementById('ap-name').focus();},350);
-  // Preview de foto ao colar URL
   document.getElementById('ap-foto').oninput=function(){
     var url=this.value.trim();
     var prev=document.getElementById('ap-foto-preview');
     var img=document.getElementById('ap-foto-img');
-    if(url){img.src=url;prev.style.display='block';}
+    _apFotoBase64=null;
+    if(url){img.src=url;prev.style.display='flex';}
     else{prev.style.display='none';}
   };
 }
@@ -2444,12 +2519,20 @@ function openAddProdModal(){
 function renderApCats(){
   var cats=['feminino','masculino','kit','hidratante','maes','kids'];
   document.getElementById('ap-cat-sel').innerHTML=cats.map(function(c){
-    var info=CAT[c]||{label:c};var a=_apCat===c;
+    var info=CAT[c]||{label:c};
+    var a=_apCats.indexOf(c)>=0;
     var col=(CAT[c]&&CAT[c].color)||'#C9A84C';
     return '<button type="button" class="ap-cat-btn'+(a?' active':'')+'" style="'+(a?'background:'+col+';border-color:'+col+';color:#080808;':'')+'" onclick="selApCat(\''+c+'\')">'+info.label+'</button>';
   }).join('');
+  var lbl=document.getElementById('ap-cat-lbl');
+  if(lbl)lbl.textContent=_apCats.length>1?'('+_apCats.length+' selecionadas)':'';
 }
-function selApCat(c){_apCat=c;renderApCats();}
+function selApCat(c){
+  var idx=_apCats.indexOf(c);
+  if(idx>=0){if(_apCats.length>1)_apCats.splice(idx,1);}
+  else{_apCats.push(c);}
+  renderApCats();
+}
 
 function renderApAbas(){
   document.getElementById('ap-aba-sel').innerHTML=ABAS_CATALOGO.map(function(a){
@@ -2469,23 +2552,23 @@ function saveNewProd(){
   var name=document.getElementById('ap-name').value.trim();
   var brand=document.getElementById('ap-brand').value.trim();
   var sub=document.getElementById('ap-sub').value.trim();
-  var foto=document.getElementById('ap-foto').value.trim();
+  var fotoUrl=document.getElementById('ap-foto').value.trim();
+  var foto=fotoUrl||(_apFotoBase64||'');
   var price=parseFloat(String(document.getElementById('ap-price').value).replace(',','.'))||0;
   if(!name){document.getElementById('ap-name').focus();return;}
   if(!brand){document.getElementById('ap-brand').focus();return;}
   if(!S.customProducts)S.customProducts=[];
   var usedIds=getAllProducts().map(function(p){return p.id;});
   var nid=1000;while(usedIds.indexOf(nid)>=0)nid++;
-  var newProd={id:nid,name:name,brand:brand,category:_apCat,sub:sub,custom:true,foto:foto,catalogTab:_apAba};
+  var newProd={id:nid,name:name,brand:brand,category:_apCats[0],categories:_apCats.slice(),sub:sub,custom:true,foto:foto,catalogTab:_apAba};
   S.customProducts.push(newProd);
   if(price>0)S.prices[nid]=price;
   save();
-  // Publica no Firebase SOMENTE se tiver foto
-  if(window._fbdb && foto){
+  if(window._fbdb && fotoUrl){
     var mostrarP=getMostrarPrecos();
     window._fbdb.ref('produtos_custom/'+nid).set({
-      id:nid,name:name,brand:brand,category:_apCat,sub:sub,
-      foto:foto,price:(mostrarP&&price)?price:null,catalogTab:_apAba,custom:true
+      id:nid,name:name,brand:brand,category:_apCats[0],categories:_apCats.slice(),sub:sub,
+      foto:fotoUrl,price:(mostrarP&&price)?price:null,catalogTab:_apAba,custom:true
     }).then(function(){
       toastMsg('✓ Produto publicado no catálogo!');
     }).catch(function(err){
@@ -2498,6 +2581,164 @@ function saveNewProd(){
   document.getElementById('modal-add-prod').classList.remove('open');
   renderAll();renderProdTab();
   if(!foto) toastMsg('✓ Salvo! Adicione uma foto para publicar no catálogo.');
+}
+
+// ── UPLOAD DE FOTO DO CELULAR ─────────────────────────────────────────────────
+function handleApFotoUpload(input){
+  var file=input.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    _apFotoBase64=e.target.result;
+    var img=document.getElementById('ap-foto-img');
+    var prev=document.getElementById('ap-foto-preview');
+    img.src=_apFotoBase64;
+    prev.style.display='flex';
+    document.getElementById('ap-foto').value='';
+    document.getElementById('ap-foto').placeholder='(foto carregada do celular)';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── ANÁLISE DE FOTO COM IA (GEMINI) ──────────────────────────────────────────
+async function analisarFotoIA(){
+  var url=document.getElementById('ap-foto').value.trim();
+  var btn=document.getElementById('ap-ai-btn');
+  var icon=document.getElementById('ap-ai-icon');
+  var txt=document.getElementById('ap-ai-txt');
+  var status=document.getElementById('ap-ai-status');
+
+  if(!url&&!_apFotoBase64){
+    status.style.display='block';
+    status.style.color='rgba(220,100,100,0.7)';
+    status.textContent='Cole a URL da foto ou use uma foto do celular primeiro';
+    return;
+  }
+
+  var GEMINI_KEY=localStorage.getItem('bela-gemini-key')||'';
+  if(!GEMINI_KEY){
+    status.style.display='block';
+    status.style.color='rgba(220,100,100,0.7)';
+    status.textContent='Configure sua chave Gemini na aba ⚙ Config → IA (Análise de Foto)';
+    return;
+  }
+
+  btn.disabled=true;btn.style.opacity='0.7';
+  icon.textContent='⏳';txt.textContent='Analisando...';
+  status.style.display='block';status.style.color='rgba(201,168,76,0.5)';
+  status.textContent='Enviando para a IA...';
+
+  try{
+    var imagePart;
+    if(_apFotoBase64){
+      var parts=_apFotoBase64.split(',');
+      var mediaType=parts[0].match(/:(.*?);/)[1];
+      imagePart={inline_data:{mime_type:mediaType,data:parts[1]}};
+    } else {
+      status.textContent='Carregando imagem...';
+      var b64Data=await urlParaBase64(url);
+      imagePart={inline_data:{mime_type:'image/jpeg',data:b64Data}};
+    }
+
+    var dica=(document.getElementById('ap-ai-dica')&&document.getElementById('ap-ai-dica').value.trim())||'';
+    var dicaTxt=dica?'\n\nINFORMAÇÃO EXTRA DA USUÁRIA sobre este produto/kit: "'+dica+'" — use isso para complementar o que você vê na foto e deixar a descrição bem completa.':'';
+
+    status.textContent='IA analisando o produto...';
+    var modelo=localStorage.getItem('bela-gemini-modelo')||'gemini-2.5-flash';
+    var resp,data;
+    for(var tentativa=0;tentativa<4;tentativa++){
+      if(tentativa>0){
+        var espera=tentativa*3000;
+        status.textContent='Servidor ocupado, aguardando '+(espera/1000)+'s e tentando novamente ('+(tentativa+1)+'/4)...';
+        await new Promise(function(r){setTimeout(r,espera);});
+        status.textContent='Tentando novamente...';
+      }
+      resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+modelo+':generateContent?key='+GEMINI_KEY,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          contents:[{parts:[imagePart,{text:'Você é um especialista em cosméticos brasileiros (O Boticário, Eudora, Natura, Avon, etc). Analise esta foto de produto com atenção máxima.\n\nResponda SOMENTE com JSON válido, sem markdown:\n{"nome":"nome completo e exato do produto","marca":"marca exata","descricao":"descrição DETALHADA: liste TODOS os itens do kit OU tipo+volume+linha. Ex para kit: \'Creme Hidratante Acetinado 250g + Body Splash 200ml + Sabonete Líquido 250ml\'. Ex para perfume: \'Deo Parfum Feminino 75ml — Linha Lily\'. Seja específica, nunca use apenas \'perfume\' ou \'kit\'","categorias":["cat1","cat2"],"aba":"todos|colecao|maes|beleza|maquiagens|infantis"}\n\nRegras para categorias (pode ter VÁRIAS):\n- "feminino" = produto para mulher (perfume fem, creme, sabonete fem)\n- "masculino" = produto para homem\n- "kit" = conjunto com 2+ itens\n- "hidratante" = creme, loção, sabonete, óleo corporal, body splash\n- "kids" = infantil/bebê\nEx: kit feminino com hidratante → ["kit","feminino","hidratante"]\n\nRegras para aba:\n- todos=geral, colecao=lançamento/especial, maes=dia das mães, beleza=beleza e kids, maquiagens=maquiagem, infantis=bebê'+dicaTxt}]}],
+          generationConfig:{temperature:0.1,maxOutputTokens:2048}
+        })
+      });
+      data=await resp.json();
+      if(resp.ok)break;
+      var errTxt=(data.error&&data.error.message)||'';
+      var retentar=errTxt.toLowerCase().includes('demand')||errTxt.toLowerCase().includes('overload')||errTxt.toLowerCase().includes('retry')||resp.status===503||resp.status===429;
+      if(!retentar)break;
+    }
+
+    if(!resp.ok){throw new Error((data.error&&data.error.message)||'Erro '+resp.status);}
+
+    var raw='';
+    try{raw=data.candidates[0].content.parts[0].text;}catch(e){}
+    if(!raw&&data.candidates&&data.candidates[0]&&data.candidates[0].finishReason){
+      throw new Error('Gemini bloqueou: '+data.candidates[0].finishReason);
+    }
+
+    raw=raw.replace(/```json|```/g,'').trim();
+    var start=raw.indexOf('{'),end=raw.lastIndexOf('}');
+    if(start>=0&&end>start)raw=raw.substring(start,end+1);
+
+    var parsed={};
+    try{parsed=JSON.parse(raw);}catch(je){
+      var mNome=raw.match(/"nome"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      var mMarca=raw.match(/"marca"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      var mDescM=raw.match(/"descricao"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      var mDesc=mDescM?[null,mDescM[1].replace(/"$/,'').replace(/\\"/g,'"')]:null;
+      var mCats=raw.match(/"categorias"\s*:\s*\[([^\]]+)\]/);
+      var mCat=raw.match(/"categoria"\s*:\s*"([^"]+)"/);
+      var mAba=raw.match(/"aba"\s*:\s*"([^"]+)"/);
+      var catsArr=[];
+      if(mCats)catsArr=mCats[1].match(/"([^"]+)"/g).map(function(s){return s.replace(/"/g,'');});
+      else if(mCat)catsArr=[mCat[1]];
+      parsed={nome:mNome?mNome[1]:'',marca:mMarca?mMarca[1]:'',descricao:mDesc?mDesc[1]:'',categorias:catsArr,aba:mAba?mAba[1]:''};
+      if(!parsed.nome&&!parsed.marca)throw new Error('Resposta da IA incompleta. Tente novamente.');
+    }
+
+    if(parsed.nome)document.getElementById('ap-name').value=parsed.nome;
+    if(parsed.marca)document.getElementById('ap-brand').value=parsed.marca;
+    if(parsed.descricao)document.getElementById('ap-sub').value=parsed.descricao;
+    var cats=parsed.categorias||(parsed.categoria?[parsed.categoria]:[]);
+    var validCats=['feminino','masculino','kit','hidratante','kids'];
+    cats=cats.filter(function(c){return validCats.indexOf(c)>=0;});
+    if(cats.length>0){_apCats=cats;renderApCats();}
+    if(parsed.aba&&['todos','colecao','maes','beleza','maquiagens','infantis'].indexOf(parsed.aba)>=0){
+      _apAba=parsed.aba;renderApAbas();
+    }
+
+    icon.textContent='✓';txt.textContent='Preenchido pela IA!';
+    btn.style.background='linear-gradient(135deg,rgba(125,216,125,0.15),rgba(125,216,125,0.07))';
+    btn.style.borderColor='rgba(125,216,125,0.4)';btn.style.color='#7dd87d';
+    status.style.color='rgba(125,216,125,0.6)';status.textContent='Verifique e ajuste se necessário ✓';
+
+  }catch(err){
+    icon.textContent='⚠';txt.textContent='Erro ao analisar';
+    status.style.color='rgba(220,100,100,0.6)';
+    status.textContent='⚠ '+(err&&err.message?err.message:String(err));
+    console.error('Gemini erro:',err);
+  }finally{
+    btn.disabled=false;btn.style.opacity='1';
+  }
+}
+
+function urlParaBase64(url){
+  return new Promise(function(resolve,reject){
+    var img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=function(){
+      try{
+        var canvas=document.createElement('canvas');
+        canvas.width=Math.min(img.naturalWidth,1024);
+        canvas.height=Math.round(img.naturalHeight*canvas.width/img.naturalWidth);
+        var ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        var dataUrl=canvas.toDataURL('image/jpeg',0.85);
+        resolve(dataUrl.split(',')[1]);
+      }catch(e){reject(new Error('Canvas bloqueado (CORS): tente usar "Foto do celular" em vez de URL'));}
+    };
+    img.onerror=function(){reject(new Error('Não carregou a imagem. Tente usar "📷 Usar foto do celular"'));};
+    img.src=url;
+  });
 }
 
 
@@ -2585,16 +2826,15 @@ function buscarProdEdit(q){
 
 // ── MODAL EDITAR PRODUTO ──────────────────────────────────────────────────────
 var _epId=null;
-var _epCat='feminino';
+var _epCats=['feminino'];
 var _epAba='todos';
 
 function openEditProdModal(id){
-  // Busca em customProducts primeiro, depois nos PRODUCTS fixos
   var p=(S.customProducts||[]).find(function(x){return x.id===id;})
      || PRODUCTS.find(function(x){return x.id===id;});
   if(!p)return;
   _epId=id;
-  _epCat=p.category||'feminino';
+  _epCats=p.categories&&p.categories.length?p.categories.slice():[p.category||'feminino'];
   _epAba=p.catalogTab||'todos';
 
   document.getElementById('ep-sub').textContent=p.name;
@@ -2604,16 +2844,13 @@ function openEditProdModal(id){
   document.getElementById('ep-price').value=gp(id)||'';
   document.getElementById('ep-foto').value=p.foto||'';
 
-  // preview foto
   var prev=document.getElementById('ep-foto-preview');
   var img=document.getElementById('ep-foto-img');
   if(p.foto){img.src=p.foto;prev.style.display='block';}
   else{prev.style.display='none';}
 
-  // aviso sem foto
   document.getElementById('ep-sem-foto-aviso').style.display=p.foto?'none':'block';
 
-  // preview listener
   document.getElementById('ep-foto').oninput=function(){
     var url=this.value.trim();
     if(url){img.src=url;prev.style.display='block';document.getElementById('ep-sem-foto-aviso').style.display='none';}
@@ -2623,7 +2860,6 @@ function openEditProdModal(id){
   renderEpCats();
   renderEpAbas();
 
-  // Limpa busca
   var inp=document.getElementById('edit-prod-search');
   var res=document.getElementById('edit-prod-results');
   if(inp)inp.value='';
@@ -2641,12 +2877,20 @@ function closeEditProdModal(e){
 function renderEpCats(){
   var cats=['feminino','masculino','kit','hidratante','maes','kids'];
   document.getElementById('ep-cat-sel').innerHTML=cats.map(function(c){
-    var info=CAT[c]||{label:c};var a=_epCat===c;
+    var info=CAT[c]||{label:c};
+    var a=_epCats.indexOf(c)>=0;
     var col=(CAT[c]&&CAT[c].color)||'#C9A84C';
     return '<button type="button" class="ap-cat-btn'+(a?' active':'')+'" style="'+(a?'background:'+col+';border-color:'+col+';color:#080808;':'')+'" onclick="selEpCat(\''+c+'\')" >'+info.label+'</button>';
   }).join('');
+  var lbl=document.getElementById('ep-cat-lbl');
+  if(lbl)lbl.textContent=_epCats.length>1?'('+_epCats.length+' selecionadas)':'';
 }
-function selEpCat(c){_epCat=c;renderEpCats();}
+function selEpCat(c){
+  var idx=_epCats.indexOf(c);
+  if(idx>=0){if(_epCats.length>1)_epCats.splice(idx,1);}
+  else{_epCats.push(c);}
+  renderEpCats();
+}
 
 function renderEpAbas(){
   document.getElementById('ep-aba-sel').innerHTML=ABAS_CATALOGO.map(function(a){
@@ -2667,13 +2911,11 @@ function saveEditProd(){
   if(!name){document.getElementById('ep-name').focus();return;}
   if(!brand){document.getElementById('ep-brand').focus();return;}
 
-  // Tenta atualizar em customProducts; se não existir, cria entrada lá
   if(!S.customProducts)S.customProducts=[];
   var idx=S.customProducts.findIndex(function(p){return p.id===_epId;});
   if(idx<0){
-    // Produto é do PRODUCTS fixo — cria cópia editável em customProducts
     var base=PRODUCTS.find(function(x){return x.id===_epId;})||{};
-    S.customProducts.push({id:_epId,name:base.name,brand:base.brand,category:base.category||'feminino',sub:base.sub||'',foto:base.foto||'',catalogTab:base.catalogTab||'todos',custom:true});
+    S.customProducts.push({id:_epId,name:base.name,brand:base.brand,category:base.category||'feminino',categories:[base.category||'feminino'],sub:base.sub||'',foto:base.foto||'',catalogTab:base.catalogTab||'todos',custom:true});
     idx=S.customProducts.length-1;
   }
   var prods=S.customProducts;
@@ -2681,24 +2923,23 @@ function saveEditProd(){
   prods[idx].brand=brand;
   prods[idx].sub=sub;
   prods[idx].foto=foto;
-  prods[idx].category=_epCat;
+  prods[idx].category=_epCats[0];
+  prods[idx].categories=_epCats.slice();
   prods[idx].catalogTab=_epAba;
-  if(price>0) S.prices[_epId]=price;
+  if(price>0)S.prices[_epId]=price;
 
   save();
 
-  // Sincroniza Firebase — só publica se tiver foto
   try{
     if(window._fbdb){
       if(foto){
         var mostrarP=getMostrarPrecos();
         window._fbdb.ref('produtos_custom/'+_epId).set({
-          id:_epId,name:name,brand:brand,category:_epCat,sub:sub,
+          id:_epId,name:name,brand:brand,category:_epCats[0],categories:_epCats.slice(),sub:sub,
           foto:foto,price:(mostrarP&&price)?price:null,catalogTab:_epAba,custom:true
         });
-        if(mostrarP&&price) window._fbdb.ref('precos/'+_epId).set(price);
+        if(mostrarP&&price)window._fbdb.ref('precos/'+_epId).set(price);
       } else {
-        // Remove do catálogo se tirou a foto
         window._fbdb.ref('produtos_custom/'+_epId).remove();
       }
     }
@@ -2710,8 +2951,106 @@ function saveEditProd(){
   toastMsg(foto?'✓ Produto atualizado no catálogo!':'✓ Salvo! Adicione foto para publicar no catálogo.');
 }
 
+// ── APAGAR PRODUTO ────────────────────────────────────────────────────────────
+function confirmarApagarProduto(){
+  if(_epId===null)return;
+  var p=(S.customProducts||[]).find(function(x){return x.id===_epId;});
+  if(!p)return;
+  document.getElementById('confirm-del-name').textContent=p.name+' — '+p.brand;
+  document.getElementById('modal-confirm-del').classList.add('open');
+}
+
+function executarApagarProduto(){
+  if(_epId===null)return;
+  var id=_epId;
+  S.customProducts=(S.customProducts||[]).filter(function(p){return p.id!==id;});
+  delete S.prices[id];
+  try{
+    if(window._fbdb){
+      window._fbdb.ref('produtos_custom/'+id).remove();
+      window._fbdb.ref('precos/'+id).remove();
+    }
+  }catch(e){}
+  save();
+  document.getElementById('modal-confirm-del').classList.remove('open');
+  document.getElementById('modal-edit-prod').classList.remove('open');
+  _epId=null;
+  renderAll();renderProdTab();
+  toastMsg('🗑 Produto removido do catálogo.');
+}
+
 function setPagF(f){PAG_FILTER=f;renderPag();}
 function setPagSort(s){PAG_SORT=s;renderPag();}
+
+// ── CHAVE GEMINI ──────────────────────────────────────────────────────────────
+function carregarChaveGeminiNaUI(){
+  var key=localStorage.getItem('bela-gemini-key')||'';
+  var inp=document.getElementById('cfg-gemini-key-input');
+  var st=document.getElementById('cfg-gemini-status');
+  if(!inp)return;
+  inp.value=key;
+  if(key){st.style.color='rgba(125,216,125,0.7)';st.textContent='✓ Chave salva — IA de análise de fotos ativa';}
+  else{st.style.color='rgba(240,232,220,0.25)';st.textContent='Sem chave — análise de fotos desativada';}
+}
+function cfgGeminiKeyChanged(){
+  var st=document.getElementById('cfg-gemini-status');
+  if(st){st.style.color='rgba(201,168,76,0.5)';st.textContent='Clique em Salvar para confirmar';}
+}
+function salvarChaveGemini(){
+  var key=(document.getElementById('cfg-gemini-key-input').value||'').trim();
+  if(!key){apagarChaveGemini();return;}
+  localStorage.setItem('bela-gemini-key',key);
+  var st=document.getElementById('cfg-gemini-status');
+  st.style.color='rgba(125,216,125,0.7)';st.textContent='✓ Chave salva com sucesso!';
+  toastMsg('✓ Chave Gemini salva!');
+}
+function apagarChaveGemini(){
+  localStorage.removeItem('bela-gemini-key');
+  var inp=document.getElementById('cfg-gemini-key-input');
+  var st=document.getElementById('cfg-gemini-status');
+  if(inp)inp.value='';
+  if(st){st.style.color='rgba(240,232,220,0.25)';st.textContent='Chave removida — análise de fotos desativada';}
+  toastMsg('✓ Chave removida');
+}
+function toggleGeminiKeyVisibility(){
+  var inp=document.getElementById('cfg-gemini-key-input');
+  if(!inp)return;
+  inp.type=inp.type==='password'?'text':'password';
+}
+async function testarChaveGemini(){
+  var key=(document.getElementById('cfg-gemini-key-input').value||'').trim()||localStorage.getItem('bela-gemini-key')||'';
+  var st=document.getElementById('cfg-gemini-status');
+  if(!key){st.style.color='rgba(220,100,100,0.7)';st.textContent='Cole a chave primeiro';return;}
+  var modelos=['gemini-2.5-flash','gemini-flash-latest','gemini-2.0-flash','gemini-2.0-flash-001','gemini-2.0-flash-lite','gemini-2.0-flash-lite-001','gemini-2.5-flash-lite','gemini-1.5-flash'];
+  st.style.color='rgba(201,168,76,0.6)';st.textContent='⏳ Testando modelos disponíveis...';
+  for(var i=0;i<modelos.length;i++){
+    var modelo=modelos[i];
+    try{
+      var resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+modelo+':generateContent?key='+key,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{parts:[{text:'ok'}]}],generationConfig:{maxOutputTokens:5}})
+      });
+      var data=await resp.json();
+      if(resp.ok){
+        localStorage.setItem('bela-gemini-modelo',modelo);
+        st.style.color='rgba(125,216,125,0.8)';
+        st.textContent='✓ Funcionou com: '+modelo+' — IA ativa!';
+        toastMsg('✓ Modelo '+modelo+' ativo!');
+        return;
+      }
+    }catch(e){}
+  }
+  try{
+    var lr=await fetch('https://generativelanguage.googleapis.com/v1beta/models?key='+key);
+    var ld=await lr.json();
+    var nomes=(ld.models||[]).filter(function(m){return m.supportedGenerationMethods&&m.supportedGenerationMethods.indexOf('generateContent')>=0;}).map(function(m){return m.name.replace('models/','');});
+    st.style.color='rgba(220,100,100,0.8)';
+    st.textContent='✗ Nenhum modelo funcionou. Disponíveis: '+(nomes.length?nomes.join(', '):'nenhum');
+  }catch(e){
+    st.style.color='rgba(220,100,100,0.8)';
+    st.textContent='✗ Chave inválida ou sem acesso à API';
+  }
+}
 
 function fmtDate(d){
   if(!d)return'—';
@@ -2757,6 +3096,16 @@ function savePagMeta(){
 <!-- Firebase SDK (carrega por último para não bloquear o app) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script>iniciarFirebase();</script>
+<script>
+(function tentarIniciar(n){
+  if(typeof firebase!=="undefined"&&firebase.initializeApp){
+    iniciarFirebase();
+  } else if(n>0){
+    setTimeout(function(){tentarIniciar(n-1);},200);
+  } else {
+    if(typeof setFbStatus==="function") setFbStatus(false,"Firebase SDK nao carregou");
+  }
+})(20);
+</script>
 </body>
 </html>
