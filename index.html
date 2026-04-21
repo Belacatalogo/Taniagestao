@@ -459,9 +459,18 @@ input,select{font-family:'Montserrat',sans-serif}
     </div>
   </div>
   <div class="cfg-section">
-    <div class="cfg-section-title">Produtos adicionados por você</div>
+    <div class="cfg-section-title">Todos os Produtos</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;padding:0 0 10px;">
+      <button id="prod-tab-filter-todos" class="filter-btn" style="font-size:0.52rem;padding:5px 11px;border-radius:20px;background:#C9A84C;border:1px solid #C9A84C;color:#080808;" onclick="setProdTabFilter('todos',this)">✦ Todos</button>
+      <button class="filter-btn" style="font-size:0.52rem;padding:5px 11px;border-radius:20px;" onclick="setProdTabFilter('feminino',this)">🌸 Feminino</button>
+      <button class="filter-btn" style="font-size:0.52rem;padding:5px 11px;border-radius:20px;" onclick="setProdTabFilter('masculino',this)">🔷 Masculino</button>
+      <button class="filter-btn" style="font-size:0.52rem;padding:5px 11px;border-radius:20px;" onclick="setProdTabFilter('kit',this)">🎁 Kits</button>
+      <button class="filter-btn" style="font-size:0.52rem;padding:5px 11px;border-radius:20px;" onclick="setProdTabFilter('hidratante',this)">💧 Hidratantes</button>
+      <button class="filter-btn" style="font-size:0.52rem;padding:5px 11px;border-radius:20px;" onclick="setProdTabFilter('maes',this)">🌸 Dia das Mães</button>
+      <button class="filter-btn" style="font-size:0.52rem;padding:5px 11px;border-radius:20px;" onclick="setProdTabFilter('kids',this)">👶 Kids</button>
+    </div>
     <div id="custom-prod-list" style="padding:0 0 4px"></div>
-    <div id="custom-prod-empty" style="display:none;text-align:center;padding:30px 20px;color:rgba(240,232,220,0.16);font-size:0.6rem;letter-spacing:0.28em;text-transform:uppercase;">Nenhum produto adicionado ainda</div>
+    <div id="custom-prod-empty" style="display:none;text-align:center;padding:30px 20px;color:rgba(240,232,220,0.16);font-size:0.6rem;letter-spacing:0.28em;text-transform:uppercase;">Nenhum produto encontrado</div>
   </div>
   <div class="spacer"></div>
 </div>
@@ -942,7 +951,17 @@ function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 function gp(id){var r=S.prices[id];if(!r&&r!==0)return 0;var v=parseFloat(String(r).replace(',','.'));return isNaN(v)?0:v;}
 function ini(name){return name.trim().split(' ').map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase();}
 function getSales(id){return S.sales[id]||[];}
-function getAllProducts(){return PRODUCTS.concat(S.customProducts||[]);}
+function getAllProducts(){
+  // customProducts já inclui todos os PRODUCTS (mesclados no load()),
+  // mais quaisquer produtos adicionados manualmente pelo Firebase.
+  // Retorna customProducts como fonte única para evitar duplicatas.
+  var custom=S.customProducts||[];
+  if(!custom.length) return PRODUCTS.slice();
+  // Garante que produtos do PRODUCTS que ainda não estejam em custom sejam incluídos
+  var ids=custom.map(function(p){return p.id;});
+  var extras=PRODUCTS.filter(function(p){return ids.indexOf(p.id)<0;});
+  return extras.concat(custom);
+}
 
 function ci(price,sale){
   var qty=(sale&&sale.qty&&sale.qty>1)?sale.qty:1;
@@ -1290,40 +1309,69 @@ function iniciarFirebase(){
     db.ref('produtos_custom').once('value',function(snap){
       var data=snap.val()||{};
       var fbIds=Object.keys(data).map(Number);
-      var localIds=(S.customProducts||[]).map(function(p){return p.id;});
-      var novos=0;
+      if(!S.customProducts)S.customProducts=[];
+      var localIds=S.customProducts.map(function(p){return p.id;});
+      var novos=0,atualizados=0;
       fbIds.forEach(function(id){
-        if(localIds.indexOf(id)<0){
-          var p=data[id];
-          if(!S.customProducts)S.customProducts=[];
+        var p=data[id];
+        if(!p)return;
+        var idx=localIds.indexOf(id);
+        if(idx<0){
+          // Produto novo vindo do Firebase — adiciona
           S.customProducts.push({id:p.id,name:p.name,brand:p.brand,category:p.category,sub:p.sub||'',custom:true,foto:p.foto||'',catalogTab:p.catalogTab||'todos'});
-          if(p.price)S.prices[p.id]=p.price;
+          localIds.push(id);
           novos++;
         } else {
-          // Atualiza preço do produto existente se vier do Firebase
-          var p=data[id];
-          if(p && p.price) S.prices[p.id]=p.price;
+          // Produto existente — atualiza campos do Firebase (foto, nome, brand, sub, tab)
+          var local=S.customProducts[idx];
+          if(p.foto) local.foto=p.foto;
+          if(p.name) local.name=p.name;
+          if(p.brand) local.brand=p.brand;
+          if(p.sub) local.sub=p.sub;
+          if(p.category) local.category=p.category;
+          if(p.catalogTab) local.catalogTab=p.catalogTab;
+          atualizados++;
         }
+        if(p.price) S.prices[p.id]=p.price;
       });
-      if(novos>0){save();renderAll();renderProdTab();toastMsg(novos+' produto(s) sincronizado(s) do Firebase');}
+      if(novos>0||atualizados>0){
+        save();renderAll();renderProdTab();
+        if(novos>0) toastMsg(novos+' produto(s) novo(s) sincronizado(s) do Firebase');
+      }
     });
 
     // Listener: produtos_estaticos → sincroniza produtos fixos do Firebase para o gestão
     db.ref('produtos_estaticos').once('value',function(snap){
       var data=snap.val()||{};
-      var updated=0;
+      if(!S.customProducts)S.customProducts=[];
+      var localIds=S.customProducts.map(function(p){return p.id;});
+      var updated=0,novos=0;
       Object.keys(data).forEach(function(id){
         var p=data[id];
         if(!p)return;
-        // Atualiza foto e dados se o produto existir no array local
-        var local=PRODUCTS.find(function(x){return x.id===p.id;});
-        if(local){
-          if(p.foto)local.foto=p.foto;
+        var pid=parseInt(id);
+        var idx=localIds.indexOf(pid);
+        if(idx>=0){
+          // Atualiza foto e dados se o produto já existir
+          var local=S.customProducts[idx];
+          if(p.foto){local.foto=p.foto;updated++;}
           if(p.sub)local.sub=p.sub;
-          updated++;
+          if(p.name)local.name=p.name;
+          if(p.brand)local.brand=p.brand;
+          if(p.category)local.category=p.category;
+          if(p.catalogTab)local.catalogTab=p.catalogTab;
+        } else {
+          // Produto estático novo — adiciona ao gestão
+          S.customProducts.push({
+            id:pid,name:p.name||'',brand:p.brand||'',category:p.category||'feminino',
+            sub:p.sub||'',foto:p.foto||'',catalogTab:p.catalogTab||'todos',custom:true
+          });
+          localIds.push(pid);
+          novos++;
         }
+        if(p.price)S.prices[pid]=p.price;
       });
-      if(updated>0)renderAll();
+      if(updated>0||novos>0){save();renderAll();renderProdTab();}
     });
 
     // Listener: precos → atualiza preços locais em tempo real (inclui produtos fixos)
@@ -1355,6 +1403,7 @@ function switchTab(name){
   if(name==='config')renderConfig();
   if(name==='clientes')renderClientes();
   if(name==='relatorio')renderRelatorio();
+  if(name==='produtos')renderProdTab();
 }
 
 // ─── BACKUP / EXPORTAR / IMPORTAR ─────────────────────────────────────────
@@ -1572,7 +1621,7 @@ function renderConfig(){
   // info
   var nVendas=0;
   Object.values(S.sales||{}).forEach(function(arr){nVendas+=arr.length;});
-  document.getElementById('cfg-n-produtos').textContent=getAllProducts().length+(S.customProducts&&S.customProducts.length?' ('+S.customProducts.length+' seus)':'');
+  document.getElementById('cfg-n-produtos').textContent=getAllProducts().length+' produtos'+(S.customProducts&&S.customProducts.length?' ('+S.customProducts.length+' personalizados)':'');
   document.getElementById('cfg-n-vendas').textContent=nVendas;
   var json=JSON.stringify({prices:S.prices,sold:S.sold,sales:S.sales,pagMeta:S.pagMeta||{}});
   var kb=(new Blob([json]).size/1024).toFixed(1);
@@ -2308,21 +2357,36 @@ var ABAS_CATALOGO=[
   {id:'infantis',   label:'Infantis'},
 ];
 
+var _prodTabFilter='todos';
+function setProdTabFilter(f,btn){
+  _prodTabFilter=f;
+  document.querySelectorAll('#tab-produtos .filter-btn').forEach(function(b){
+    b.style.background='transparent';b.style.borderColor='rgba(201,168,76,0.3)';b.style.color='rgba(232,221,208,0.6)';
+  });
+  if(btn){btn.style.background='#C9A84C';btn.style.borderColor='#C9A84C';btn.style.color='#080808';}
+  renderProdTab();
+}
+
 function renderProdTab(){
   var list=document.getElementById('custom-prod-list');
   var empty=document.getElementById('custom-prod-empty');
   if(!list)return;
-  var prods=S.customProducts||[];
-  if(!prods.length){list.innerHTML='';empty.style.display='block';return;}
+  // Junta PRODUCTS fixos + customProducts sem duplicar IDs
+  var customIds=(S.customProducts||[]).map(function(p){return p.id;});
+  var todos=PRODUCTS.filter(function(p){return customIds.indexOf(p.id)<0;}).concat(S.customProducts||[]);
+  // Aplica filtro de categoria
+  var filtrados=(_prodTabFilter==='todos')?todos:todos.filter(function(p){return p.category===_prodTabFilter;});
+  if(!filtrados.length){list.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
-  list.innerHTML=prods.map(function(p){
+  list.innerHTML=filtrados.map(function(p){
     var cat=CAT[p.category]||{label:p.category,color:'#C9A84C'};
     var abaInfo=ABAS_CATALOGO.find(function(a){return a.id===p.catalogTab;})||{label:'Todos'};
     var semFoto=!p.foto;
+    var isCustom=!!(S.customProducts||[]).find(function(c){return c.id===p.id;});
     return '<div class="cprod-card" style="'+(semFoto?'border-color:rgba(232,192,96,0.25);':'')+'">' +
       (p.foto
         ? '<img src="'+esc(p.foto)+'" alt="'+esc(p.name)+'" style="width:48px;height:48px;object-fit:cover;border-radius:4px;flex-shrink:0;">'
-        : '<div style="width:48px;height:48px;border-radius:4px;background:rgba(232,192,96,0.07);border:1px dashed rgba(232,192,96,0.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;position:relative;" title="Sem foto — não aparece no catálogo">📷</div>')+
+        : '<div style="width:48px;height:48px;border-radius:4px;background:rgba(232,192,96,0.07);border:1px dashed rgba(232,192,96,0.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;" title="Sem foto">📷</div>')+
       '<div class="cprod-info">'+
         '<div class="cprod-name">'+esc(p.name)+'</div>'+
         '<div class="cprod-brand" style="color:'+cat.color+';">'+esc(p.brand)+'</div>'+
@@ -2333,7 +2397,7 @@ function renderProdTab(){
       '</div>'+
       '<div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">'+
         '<button class="cprod-del" style="background:rgba(201,168,76,0.08);border-color:rgba(201,168,76,0.25);color:#e8c97a;font-size:0.7rem;" onclick="openEditProdModal('+p.id+')">✏</button>'+
-        '<button class="cprod-del" onclick="removeCustomProd('+p.id+')">✕</button>'+
+        (isCustom?'<button class="cprod-del" onclick="removeCustomProd('+p.id+')">✕</button>':'')+
       '</div>'+
     '</div>';
   }).join('');
@@ -2476,27 +2540,9 @@ function buscarProdEdit(q){
     return;
   }
 
-  // Garante que produtos do Firebase estejam carregados
-  var prods=S.customProducts||[];
-
-  // Se lista vazia, tenta buscar direto do Firebase
-  if(!prods.length && window._fbdb){
-    results.style.display='block';
-    results.innerHTML='<div style="padding:14px;font-size:0.6rem;color:rgba(240,232,220,0.3);text-align:center;letter-spacing:0.2em;">Carregando...</div>';
-    window._fbdb.ref('produtos_custom').once('value',function(snap){
-      var data=snap.val()||{};
-      Object.keys(data).forEach(function(id){
-        var p=data[id];
-        if(!S.customProducts)S.customProducts=[];
-        if(!S.customProducts.find(function(x){return x.id===p.id;})){
-          S.customProducts.push({id:p.id,name:p.name,brand:p.brand,category:p.category,sub:p.sub||'',custom:true,foto:p.foto||'',catalogTab:p.catalogTab||'todos'});
-          if(p.price)S.prices[p.id]=p.price;
-        }
-      });
-      buscarProdEdit(document.getElementById('edit-prod-search').value);
-    });
-    return;
-  }
+  // Busca em TODOS os produtos (fixos + customProducts)
+  var customIds=(S.customProducts||[]).map(function(p){return p.id;});
+  var prods=PRODUCTS.filter(function(p){return customIds.indexOf(p.id)<0;}).concat(S.customProducts||[]);
 
   var ql=q.toLowerCase();
   var filtrados=prods.filter(function(p){
@@ -2543,7 +2589,9 @@ var _epCat='feminino';
 var _epAba='todos';
 
 function openEditProdModal(id){
-  var p=(S.customProducts||[]).find(function(x){return x.id===id;});
+  // Busca em customProducts primeiro, depois nos PRODUCTS fixos
+  var p=(S.customProducts||[]).find(function(x){return x.id===id;})
+     || PRODUCTS.find(function(x){return x.id===id;});
   if(!p)return;
   _epId=id;
   _epCat=p.category||'feminino';
@@ -2619,10 +2667,16 @@ function saveEditProd(){
   if(!name){document.getElementById('ep-name').focus();return;}
   if(!brand){document.getElementById('ep-brand').focus();return;}
 
-  var prods=S.customProducts||[];
-  var idx=prods.findIndex(function(p){return p.id===_epId;});
-  if(idx<0)return;
-
+  // Tenta atualizar em customProducts; se não existir, cria entrada lá
+  if(!S.customProducts)S.customProducts=[];
+  var idx=S.customProducts.findIndex(function(p){return p.id===_epId;});
+  if(idx<0){
+    // Produto é do PRODUCTS fixo — cria cópia editável em customProducts
+    var base=PRODUCTS.find(function(x){return x.id===_epId;})||{};
+    S.customProducts.push({id:_epId,name:base.name,brand:base.brand,category:base.category||'feminino',sub:base.sub||'',foto:base.foto||'',catalogTab:base.catalogTab||'todos',custom:true});
+    idx=S.customProducts.length-1;
+  }
+  var prods=S.customProducts;
   prods[idx].name=name;
   prods[idx].brand=brand;
   prods[idx].sub=sub;
