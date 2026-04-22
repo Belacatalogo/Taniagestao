@@ -1404,8 +1404,8 @@ function iniciarFirebase(){
       }
     });
 
-    // Listener: produtos_estaticos → sincroniza produtos fixos do Firebase para o gestão
-    db.ref('produtos_estaticos').once('value',function(snap){
+    // Listener: produtos_estaticos → sincroniza produtos fixos do Firebase para o gestão (tempo real)
+    db.ref('produtos_estaticos').on('value',function(snap){
       var data=snap.val()||{};
       if(!S.customProducts)S.customProducts=[];
       var localIds=S.customProducts.map(function(p){return p.id;});
@@ -1418,13 +1418,16 @@ function iniciarFirebase(){
         if(idx>=0){
           // Atualiza foto e dados se o produto já existir
           var local=S.customProducts[idx];
-          if(p.foto){local.foto=p.foto;updated++;}
+          if(p.foto)local.foto=p.foto;
           if(p.sub)local.sub=p.sub;
           if(p.name)local.name=p.name;
           if(p.brand)local.brand=p.brand;
           if(p.category)local.category=p.category;
+          // Sempre atualiza catalogTab e catalogTabs (permite mudança de aba pelo gestão)
           if(p.catalogTab)local.catalogTab=p.catalogTab;
-          if(p.catalogTabs&&p.catalogTabs.length)local.catalogTabs=p.catalogTabs;
+          if(p.catalogTabs&&p.catalogTabs.length){local.catalogTabs=p.catalogTabs;}
+          else if(p.catalogTab){local.catalogTabs=[p.catalogTab];}
+          updated++;
         } else {
           // Produto estático novo — adiciona ao gestão
           S.customProducts.push({
@@ -2959,16 +2962,37 @@ function saveEditProd(){
 
   try{
     if(window._fbdb){
+      var mostrarP=getMostrarPrecos();
+      // Verifica se o produto era originalmente estático (veio de PRODUCTS ou produtos_estaticos)
+      var eraEstatico=PRODUCTS.some(function(x){return x.id===_epId;});
+
       if(foto){
-        var mostrarP=getMostrarPrecos();
+        // Sempre grava em produtos_custom (lido tanto pelo catálogo quanto pelo gestão)
         window._fbdb.ref('produtos_custom/'+_epId).set({
           id:_epId,name:name,brand:brand,category:_epCats[0],categories:_epCats.slice(),sub:sub,
           foto:foto,price:(mostrarP&&price)?price:null,catalogTab:_epAbas[0],catalogTabs:_epAbas.slice(),custom:true
         });
-        if(mostrarP&&price)window._fbdb.ref('precos/'+_epId).set(price);
+        // Se também é estático, atualiza produtos_estaticos para sincronizar as abas lá também
+        if(eraEstatico){
+          window._fbdb.ref('produtos_estaticos/'+_epId).update({
+            catalogTab:_epAbas[0],catalogTabs:_epAbas.slice(),
+            name:name,brand:brand,sub:sub,category:_epCats[0],foto:foto
+          });
+        }
+        if(mostrarP&&price){
+          window._fbdb.ref('precos/'+_epId).set(price);
+          window._fbdb.ref('produtos_custom/'+_epId+'/price').set(price);
+        }
       } else {
         // Se não tem foto, remove do catálogo (Firebase)
         window._fbdb.ref('produtos_custom/'+_epId).remove();
+        // Mas se era estático, ainda atualiza as abas em produtos_estaticos
+        if(eraEstatico){
+          window._fbdb.ref('produtos_estaticos/'+_epId).update({
+            catalogTab:_epAbas[0],catalogTabs:_epAbas.slice(),
+            name:name,brand:brand,sub:sub,category:_epCats[0]
+          });
+        }
       }
     }
   }catch(e){}
