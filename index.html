@@ -2891,14 +2891,14 @@ function saveNewProd(){
   if(!S.customProducts)S.customProducts=[];
   var usedIds=getAllProducts().map(function(p){return p.id;});
   var nid=1000;while(usedIds.indexOf(nid)>=0)nid++;
-  var newProd={id:nid,name:name,brand:brand,category:_apCats[0],categories:_apCats.slice(),sub:sub,custom:true,foto:foto,catalogTab:_apAbas[0],catalogTabs:_apAbas.slice()};
+  var newProd={id:nid,name:name,brand:brand,category:_apCats.join(' '),categories:_apCats.slice(),sub:sub,custom:true,foto:foto,catalogTab:_apAbas[0],catalogTabs:_apAbas.slice()};
   S.customProducts.push(newProd);
   if(price>0)S.prices[nid]=price;
   save();
   if(window._fbdb && fotoUrl){
     var mostrarP=getMostrarPrecos();
     window._fbdb.ref('produtos_custom/'+nid).set({
-      id:nid,name:name,brand:brand,category:_apCats[0],categories:_apCats.slice(),sub:sub,
+      id:nid,name:name,brand:brand,category:_apCats.join(' '),categories:_apCats.slice(),sub:sub,
       foto:fotoUrl,price:(mostrarP&&price)?price:null,catalogTab:_apAbas[0],catalogTabs:_apAbas.slice(),custom:true
     }).then(function(){
       toastMsg('✓ Produto publicado no catálogo!');
@@ -3267,7 +3267,7 @@ function saveEditProd(){
   prods[idx].brand=brand;
   prods[idx].sub=sub;
   prods[idx].foto=foto;
-  prods[idx].category=_epCats[0];
+  prods[idx].category=_epCats.join(' ');
   prods[idx].categories=_epCats.slice();
   prods[idx].catalogTab=_epAbas[0];
   prods[idx].catalogTabs=_epAbas.slice();
@@ -3284,14 +3284,14 @@ function saveEditProd(){
       if(foto){
         // Sempre grava em produtos_custom (lido tanto pelo catálogo quanto pelo gestão)
         window._fbdb.ref('produtos_custom/'+_epId).set({
-          id:_epId,name:name,brand:brand,category:_epCats[0],categories:_epCats.slice(),sub:sub,
+          id:_epId,name:name,brand:brand,category:_epCats.join(' '),categories:_epCats.slice(),sub:sub,
           foto:foto,price:(mostrarP&&price)?price:null,catalogTab:_epAbas[0],catalogTabs:_epAbas.slice(),custom:true
         });
         // Se também é estático, atualiza produtos_estaticos para sincronizar as abas lá também
         if(eraEstatico){
           window._fbdb.ref('produtos_estaticos/'+_epId).update({
             catalogTab:_epAbas[0],catalogTabs:_epAbas.slice(),
-            name:name,brand:brand,sub:sub,category:_epCats[0],foto:foto
+            name:name,brand:brand,sub:sub,category:_epCats.join(' '),foto:foto
           });
         }
         if(mostrarP&&price){
@@ -3305,7 +3305,7 @@ function saveEditProd(){
         if(eraEstatico){
           window._fbdb.ref('produtos_estaticos/'+_epId).update({
             catalogTab:_epAbas[0],catalogTabs:_epAbas.slice(),
-            name:name,brand:brand,sub:sub,category:_epCats[0]
+            name:name,brand:brand,sub:sub,category:_epCats.join(' ')
           });
         }
       }
