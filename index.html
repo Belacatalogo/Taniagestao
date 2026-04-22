@@ -361,6 +361,21 @@ input,select{font-family:'Montserrat',sans-serif}
 .foto-add-btn{width:72px;height:72px;border-radius:6px;border:1px dashed rgba(201,168,76,0.3);background:rgba(201,168,76,0.05);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:rgba(201,168,76,0.5);font-size:1.2rem;gap:3px;flex-shrink:0;}
 .foto-add-btn span{font-size:0.38rem;letter-spacing:0.18em;text-transform:uppercase;}
 
+/* ── LOGIN SCREEN ── */
+#login-screen{position:fixed;inset:0;background:#080808;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
+#login-screen.hide{opacity:0;pointer-events:none;transition:opacity 0.4s;}
+.login-logo{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,14vw,5rem);font-weight:300;letter-spacing:0.35em;color:#f0e8dc;text-align:center;line-height:1;text-shadow:0 0 80px rgba(201,168,76,0.25);}
+.login-sub{font-size:0.52rem;letter-spacing:0.55em;text-transform:uppercase;color:#C9A84C;margin-top:10px;text-align:center;}
+.login-divider{width:60px;height:1px;background:rgba(201,168,76,0.25);margin:36px auto;}
+.login-btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:300px;padding:14px 20px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:#f0e8dc;font-family:'Montserrat',sans-serif;font-size:0.62rem;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;transition:all 0.25s;}
+.login-btn-google:active{background:rgba(255,255,255,0.12);}
+.login-google-icon{width:20px;height:20px;flex-shrink:0;}
+.login-status{font-size:0.48rem;letter-spacing:0.14em;color:rgba(240,232,220,0.3);text-align:center;margin-top:16px;min-height:16px;}
+.login-user-bar{position:fixed;top:0;right:0;z-index:8000;display:none;align-items:center;gap:8px;padding:6px 12px;background:rgba(8,8,8,0.95);border-bottom-left-radius:10px;border:1px solid rgba(201,168,76,0.12);border-top:none;border-right:none;}
+.login-user-photo{width:24px;height:24px;border-radius:50%;border:1px solid rgba(201,168,76,0.3);}
+.login-user-name{font-size:0.42rem;letter-spacing:0.16em;text-transform:uppercase;color:rgba(240,232,220,0.45);}
+.login-signout{font-size:0.38rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(201,168,76,0.4);cursor:pointer;padding:2px 6px;border-radius:4px;border:1px solid rgba(201,168,76,0.15);background:transparent;}
+
 /* ── PROD TAB ── */
 .cprod-card{background:#111;border:1px solid rgba(201,168,76,0.12);border-radius:8px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
 .cprod-info{flex:1;min-width:0}
@@ -379,6 +394,30 @@ input,select{font-family:'Montserrat',sans-serif}
 <body>
 
 <div id="toast">✓ Salvo</div>
+
+<!-- ── TELA DE LOGIN ── -->
+<div id="login-screen">
+  <div class="login-logo">Tania Parfum</div>
+  <div class="login-sub">Gestão de Vendas · Tânia</div>
+  <div class="login-divider"></div>
+  <button class="login-btn-google" onclick="loginGoogle()">
+    <svg class="login-google-icon" viewBox="0 0 48 48">
+      <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.1-4z"/>
+      <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+      <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.4-5.1l-6.2-5.2C29.3 35.3 26.8 36 24 36c-5.2 0-9.6-3-11.3-7.3l-6.5 5C9.6 39.6 16.3 44 24 44z"/>
+      <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.9 2.4-2.5 4.4-4.7 5.7l6.2 5.2C40.9 35.6 44 30.2 44 24c0-1.3-.1-2.7-.4-4z"/>
+    </svg>
+    Entrar com Google
+  </button>
+  <div class="login-status" id="login-status">Carregando...</div>
+</div>
+
+<!-- barra de usuário logado -->
+<div class="login-user-bar" id="login-user-bar">
+  <img class="login-user-photo" id="login-user-photo" src="" alt="">
+  <span class="login-user-name" id="login-user-name"></span>
+  <button class="login-signout" onclick="logoutGoogle()">Sair</button>
+</div>
 
 <div id="header" style="background:linear-gradient(160deg,#100c04 0%,#0d0d0d 60%,#0d060a 100%);border-bottom:1px solid rgba(201,168,76,0.25);padding:28px 20px 20px;text-align:center;">
   <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.6rem,10vw,4.2rem);font-weight:300;letter-spacing:0.35em;color:#f0e8dc;line-height:1;text-shadow:0 0 60px rgba(201,168,76,0.2);">Tania Parfum</div>
@@ -634,15 +673,30 @@ input,select{font-family:'Montserrat',sans-serif}
   <div class="cfg-section">
     <div class="cfg-section-title">Backup dos Dados</div>
 
+    <!-- AUTO BACKUP NA NUVEM -->
     <div class="cfg-card">
-      <div class="cfg-card-title">📤 Exportar dados</div>
-      <div class="cfg-card-desc">Baixa um arquivo <strong style="color:#e8c97a">.json</strong> com todas as suas vendas, preços e pagamentos. Salve no Google Drive, WhatsApp ou onde preferir. Use para backup ou para restaurar em outro celular.</div>
-      <button class="cfg-btn cfg-btn-gold" onclick="exportarDados()">⬇ Baixar backup agora</button>
+      <div class="cfg-card-title">☁️ Backup Automático na Nuvem</div>
+      <div class="cfg-card-desc">
+        O backup é salvo <strong style="color:#e8c97a;">automaticamente todo dia</strong> no Firebase (a mesma nuvem que sincroniza o catálogo). Ao clicar em <strong style="color:#e8c97a;">"Restaurar mais recente"</strong>, os dados do último backup são carregados automaticamente.
+      </div>
+      <div id="cfg-autobackup-status" style="font-size:0.5rem;letter-spacing:0.14em;color:rgba(201,168,76,0.55);margin-bottom:10px;min-height:14px;padding:6px 10px;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.12);border-radius:5px;">
+        Verificando status do backup...
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="cfg-btn cfg-btn-gold" style="flex:1;margin:0;" onclick="fazerBackupNuvem(true)">☁ Salvar backup agora</button>
+        <button class="cfg-btn cfg-btn-green" style="flex:1;margin:0;" onclick="restaurarBackupNuvem()">⬇ Restaurar mais recente</button>
+      </div>
+    </div>
+
+    <div class="cfg-card">
+      <div class="cfg-card-title">📤 Exportar arquivo local</div>
+      <div class="cfg-card-desc">Baixa um arquivo <strong style="color:#e8c97a">.json</strong> com todas as suas vendas, preços e pagamentos. Use como backup extra ou para abrir em outro celular.</div>
+      <button class="cfg-btn cfg-btn-gold" onclick="exportarDados()">⬇ Baixar .json agora</button>
       <div class="cfg-last-backup" id="cfg-last-backup"></div>
     </div>
 
     <div class="cfg-card">
-      <div class="cfg-card-title">📥 Importar dados</div>
+      <div class="cfg-card-title">📥 Importar arquivo local</div>
       <div class="cfg-card-desc">Restaura um backup <strong style="color:#e8c97a">.json</strong> exportado anteriormente. <span style="color:rgba(220,110,110,0.7);">Atenção: substitui todos os dados atuais.</span></div>
       <button class="cfg-btn cfg-btn-green" onclick="document.getElementById('import-file-input').click()">⬆ Selecionar arquivo de backup</button>
       <input type="file" id="import-file-input" accept=".json,application/json" onchange="importarDados(this)">
@@ -1465,120 +1519,12 @@ function deleteSale(){
 
 load();renderAll();
 
-// Esta função é chamada após o Firebase SDK carregar (no final do body)
+// Esta função é chamada pelo Firebase SDK e pela autenticação
 function setFbStatus(ok, msg){
   var dot=document.getElementById('fb-dot');
   var lbl=document.getElementById('fb-label');
   if(dot) dot.style.background=ok?'#7dd87d':'rgba(220,80,80,0.8)';
   if(lbl) lbl.textContent=msg;
-}
-
-function iniciarFirebase(){
-  try{
-    var app=firebase.initializeApp({databaseURL:'https://taniaparfum233-default-rtdb.firebaseio.com/'});
-    var db=firebase.database(app);
-    window._fbdb=db;
-    setFbStatus(true,'Firebase conectando...');
-
-    // Listener: esgotados → sincroniza com localStorage
-    db.ref('esgotados').on('value',function(snap){
-      setFbStatus(true,'Firebase ✓ conectado');
-      var data=snap.val()||{};
-      var mudou=false;
-      getAllProducts().forEach(function(p){
-        var novoVal=data[p.id]===true;
-        var atualVal=!!S.sold[p.id];
-        if(novoVal!==atualVal){if(novoVal)S.sold[p.id]=true;else delete S.sold[p.id];mudou=true;}
-      });
-      if(mudou)renderAll();
-    },function(err){
-      setFbStatus(false,'Firebase erro: '+err.code);
-    });
-
-    // Listener: produtos_custom → sincroniza customProducts do Firebase para o gestão
-    db.ref('produtos_custom').once('value',function(snap){
-      var data=snap.val()||{};
-      var fbIds=Object.keys(data).map(Number);
-      if(!S.customProducts)S.customProducts=[];
-      var localIds=S.customProducts.map(function(p){return p.id;});
-      var novos=0,atualizados=0;
-      fbIds.forEach(function(id){
-        var p=data[id];
-        if(!p)return;
-        var idx=localIds.indexOf(id);
-        if(idx<0){
-          // Produto novo vindo do Firebase — adiciona
-          S.customProducts.push({id:p.id,name:p.name,brand:p.brand,category:p.category,sub:p.sub||'',custom:true,foto:p.foto||'',catalogTab:p.catalogTab||'todos'});
-          localIds.push(id);
-          novos++;
-        } else {
-          // Produto existente — atualiza campos do Firebase (foto, nome, brand, sub, tab)
-          var local=S.customProducts[idx];
-          if(p.foto) local.foto=p.foto;
-          if(p.name) local.name=p.name;
-          if(p.brand) local.brand=p.brand;
-          if(p.sub) local.sub=p.sub;
-          if(p.category) local.category=p.category;
-          if(p.catalogTab) local.catalogTab=p.catalogTab;
-          atualizados++;
-        }
-        if(p.price) S.prices[p.id]=p.price;
-      });
-      if(novos>0||atualizados>0){
-        save();renderAll();renderProdTab();
-        if(novos>0) toastMsg(novos+' produto(s) novo(s) sincronizado(s) do Firebase');
-      }
-    });
-
-    // Listener: produtos_estaticos → sincroniza produtos fixos do Firebase para o gestão (tempo real)
-    db.ref('produtos_estaticos').on('value',function(snap){
-      var data=snap.val()||{};
-      if(!S.customProducts)S.customProducts=[];
-      var localIds=S.customProducts.map(function(p){return p.id;});
-      var updated=0,novos=0;
-      Object.keys(data).forEach(function(id){
-        var p=data[id];
-        if(!p)return;
-        var pid=parseInt(id);
-        var idx=localIds.indexOf(pid);
-        if(idx>=0){
-          // Atualiza foto e dados se o produto já existir
-          var local=S.customProducts[idx];
-          if(p.foto)local.foto=p.foto;
-          if(p.sub)local.sub=p.sub;
-          if(p.name)local.name=p.name;
-          if(p.brand)local.brand=p.brand;
-          if(p.category)local.category=p.category;
-          // Sempre atualiza catalogTab e catalogTabs (permite mudança de aba pelo gestão)
-          if(p.catalogTab)local.catalogTab=p.catalogTab;
-          if(p.catalogTabs&&p.catalogTabs.length){local.catalogTabs=p.catalogTabs;}
-          else if(p.catalogTab){local.catalogTabs=[p.catalogTab];}
-          updated++;
-        } else {
-          // Produto estático novo — adiciona ao gestão
-          S.customProducts.push({
-            id:pid,name:p.name||'',brand:p.brand||'',category:p.category||'feminino',
-            sub:p.sub||'',foto:p.foto||'',catalogTab:p.catalogTab||'todos',
-            catalogTabs:p.catalogTabs&&p.catalogTabs.length?p.catalogTabs:[p.catalogTab||'todos'],custom:true
-          });
-          localIds.push(pid);
-          novos++;
-        }
-        if(p.price)S.prices[pid]=p.price;
-      });
-      if(updated>0||novos>0){save();renderAll();renderProdTab();}
-    });
-
-    // Listener: precos → atualiza preços locais em tempo real (inclui produtos fixos)
-    db.ref('precos').on('value',function(snap){
-      var data=snap.val()||{};
-      Object.keys(data).forEach(function(id){
-        var numId=Number(id);
-        if(data[id]>0) S.prices[numId]=data[id];
-      });
-    });
-
-  }catch(e){}
 }
 
 // ─── TABS ──────────────────────────────────────────────────────────────────
@@ -1657,6 +1603,142 @@ function importarDados(input){
   };
   reader.readAsText(file);
 }
+
+// ── BACKUP AUTOMÁTICO NA NUVEM (FIREBASE) ─────────────────────────────────
+var _autoBackupTimer=null;
+
+function _backupPayload(){
+  return {
+    version:4,
+    exportedAt:new Date().toISOString(),
+    prices:S.prices,
+    sold:S.sold,
+    sales:S.sales,
+    pagMeta:S.pagMeta||{}
+  };
+}
+
+function fazerBackupNuvem(manual){
+  var db=window._fbdb;
+  if(!db){
+    if(manual) toastMsg('⚠ Firebase não conectado — backup na nuvem indisponível',true);
+    return;
+  }
+  var payload=_backupPayload();
+  var agora=new Date();
+  var ds=agora.getFullYear()+'-'+(agora.getMonth()+1+'').padStart(2,'0')+'-'+(agora.getDate()+'').padStart(2,'0');
+  var ts=agora.toISOString();
+
+  // Salva em backup/diario/<data> e atualiza backup/ultimo
+  db.ref('backup/diario/'+ds).set(payload,function(err){
+    if(err){
+      if(manual) toastMsg('✗ Erro no backup: '+err.message,true);
+      return;
+    }
+    db.ref('backup/ultimo').set({data:ds,savedAt:ts},function(){});
+    try{localStorage.setItem('bela-cloud-backup-ts',ts);}catch(e){}
+    _atualizarStatusBackup();
+    if(manual) toastMsg('✓ Backup salvo na nuvem! ('+ds+')');
+  });
+}
+
+function restaurarBackupNuvem(){
+  var db=window._fbdb;
+  if(!db){toastMsg('⚠ Firebase não conectado',true);return;}
+  var st=document.getElementById('cfg-autobackup-status');
+  if(st){st.textContent='⏳ Buscando backup mais recente...';}
+  db.ref('backup/ultimo').once('value',function(snap){
+    var info=snap.val();
+    if(!info||!info.data){
+      if(st)st.textContent='Nenhum backup na nuvem encontrado.';
+      toastMsg('⚠ Nenhum backup na nuvem encontrado',true);
+      return;
+    }
+    var ds=info.data;
+    db.ref('backup/diario/'+ds).once('value',function(snap2){
+      var data=snap2.val();
+      if(!data||(!data.prices&&!data.sales)){
+        if(st)st.textContent='Backup encontrado mas parece corrompido.';
+        toastMsg('⚠ Backup inválido',true);
+        return;
+      }
+      var dataFmt=new Date(data.exportedAt||ds).toLocaleDateString('pt-BR');
+      var ok=confirm('Restaurar backup de '+dataFmt+'?\n\nIsso substituirá TODOS os dados atuais pelo backup da nuvem.');
+      if(!ok){if(st)_atualizarStatusBackup();return;}
+      if(data.prices)S.prices=data.prices;
+      if(data.sold)S.sold=data.sold;
+      if(data.sales)S.sales=data.sales;
+      if(data.pagMeta)S.pagMeta=data.pagMeta;
+      save();renderAll();
+      toastMsg('✓ Dados restaurados do backup de '+dataFmt+'!');
+      renderConfig();
+    });
+  });
+}
+
+function _atualizarStatusBackup(){
+  var st=document.getElementById('cfg-autobackup-status');
+  if(!st)return;
+  var db=window._fbdb;
+  if(!db){
+    st.textContent='⚠ Firebase não conectado — backup na nuvem indisponível';
+    st.style.color='rgba(220,110,110,0.6)';
+    return;
+  }
+  // Verifica local primeiro para resposta rápida
+  try{
+    var ts=localStorage.getItem('bela-cloud-backup-ts');
+    if(ts){
+      var d=new Date(ts);
+      st.textContent='☁ Último backup: '+d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' — próximo automático amanhã';
+      st.style.color='rgba(125,216,125,0.7)';
+    }
+  }catch(e){}
+  // Confirma com Firebase
+  db.ref('backup/ultimo').once('value',function(snap){
+    var info=snap.val();
+    if(info&&info.savedAt){
+      var d=new Date(info.savedAt);
+      st.textContent='☁ Último backup: '+d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' — próximo automático amanhã';
+      st.style.color='rgba(125,216,125,0.7)';
+      try{localStorage.setItem('bela-cloud-backup-ts',info.savedAt);}catch(e){}
+    } else {
+      st.textContent='Nenhum backup na nuvem ainda. Clique em "Salvar backup agora".';
+      st.style.color='rgba(201,168,76,0.55)';
+    }
+  },function(){
+    st.textContent='⚠ Erro ao consultar backup na nuvem';
+    st.style.color='rgba(220,110,110,0.6)';
+  });
+}
+
+function _agendarBackupDiario(){
+  // Verifica se já fez backup hoje
+  function _deveBackup(){
+    try{
+      var ts=localStorage.getItem('bela-cloud-backup-ts');
+      if(!ts)return true;
+      var ultima=new Date(ts);
+      var hoje=new Date();
+      return ultima.toDateString()!==hoje.toDateString();
+    }catch(e){return true;}
+  }
+
+  function _loop(){
+    if(_deveBackup()){
+      // Pequeno delay para garantir que o Firebase já carregou
+      setTimeout(function(){fazerBackupNuvem(false);},3000);
+    }
+    // Reagenda em 1h para checar de novo (caso o app fique aberto)
+    _autoBackupTimer=setTimeout(_loop,60*60*1000);
+  }
+
+  // Inicia após 5s do carregamento do app
+  setTimeout(_loop,5000);
+}
+
+// Inicia o agendador
+_agendarBackupDiario();
 
 function apagarTudo(){
   var ok=confirm('⚠ ATENÇÃO\n\nIsso apagará permanentemente todas as vendas, preços e pagamentos.\n\nTem certeza? Faça um backup antes!');
@@ -2045,6 +2127,8 @@ function renderConfig(){
   carregarCarrosselDoFB();
   // aba comemorativa
   carregarAbaComemorativaDoFB();
+  // status backup nuvem
+  _atualizarStatusBackup();
   // info
   var nVendas=0;
   Object.values(S.sales||{}).forEach(function(arr){nVendas+=arr.length;});
@@ -3604,7 +3688,204 @@ function savePagMeta(){
 <!-- Firebase SDK (carrega por último para não bloquear o app) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script>
+// ── AUTENTICAÇÃO GOOGLE ────────────────────────────────────────────────────
+var _fbApp=null;
+var _fbAuth=null;
+var _currentUser=null;
+
+// Email autorizado — só VOCÊ entra
+var AUTHORIZED_EMAIL='';  // será preenchido automaticamente no primeiro login
+
+function _mostrarLogin(msg,erro){
+  var st=document.getElementById('login-status');
+  if(st){st.textContent=msg||'';st.style.color=erro?'rgba(220,100,100,0.7)':'rgba(240,232,220,0.3)';}
+}
+
+function loginGoogle(){
+  if(!_fbAuth){_mostrarLogin('Firebase ainda carregando, aguarde...',true);return;}
+  _mostrarLogin('Abrindo login do Google...');
+  var provider=new firebase.auth.GoogleAuthProvider();
+  _fbAuth.signInWithPopup(provider).catch(function(err){
+    // Fallback para redirect se popup bloqueado (comum em mobile)
+    if(err.code==='auth/popup-blocked'||err.code==='auth/popup-closed-by-user'){
+      _mostrarLogin('Redirecionando para login...');
+      _fbAuth.signInWithRedirect(provider);
+    } else {
+      _mostrarLogin('Erro: '+err.message,true);
+    }
+  });
+}
+
+function logoutGoogle(){
+  if(!_fbAuth)return;
+  if(!confirm('Sair do app?'))return;
+  _fbAuth.signOut().then(function(){
+    document.getElementById('login-user-bar').style.display='none';
+  });
+}
+
+function _onAuthStateChanged(user){
+  var ls=document.getElementById('login-screen');
+  if(!user){
+    // Não logado
+    _currentUser=null;
+    if(ls){ls.classList.remove('hide');}
+    _mostrarLogin('Entre com sua conta Google para acessar.');
+    return;
+  }
+
+  // Verifica se é a conta autorizada
+  var savedEmail=localStorage.getItem('bela-auth-email')||'';
+  if(!savedEmail){
+    // Primeiro login: registra o e-mail como dono
+    localStorage.setItem('bela-auth-email',user.email);
+    savedEmail=user.email;
+  }
+
+  if(user.email!==savedEmail){
+    // Conta não autorizada
+    _fbAuth.signOut();
+    _mostrarLogin('⚠ Acesso negado. Este app pertence a outra conta.',true);
+    return;
+  }
+
+  // Login OK
+  _currentUser=user;
+  if(ls){ls.classList.add('hide');setTimeout(function(){ls.style.display='none';},400);}
+
+  // Mostra barra de usuário
+  var bar=document.getElementById('login-user-bar');
+  var photo=document.getElementById('login-user-photo');
+  var name=document.getElementById('login-user-name');
+  if(bar){bar.style.display='flex';}
+  if(photo&&user.photoURL){photo.src=user.photoURL;}
+  if(name){name.textContent=user.displayName?user.displayName.split(' ')[0]:user.email;}
+
+  // Inicia o Firebase Database
+  if(!window._fbdb&&_fbApp){
+    var db=firebase.database(_fbApp);
+    window._fbdb=db;
+    _iniciarListenersFB(db);
+  }
+  _atualizarStatusBackup();
+}
+
+function iniciarFirebase(){
+  try{
+    _fbApp=firebase.initializeApp({
+      apiKey:'COLE_SUA_API_KEY_AQUI',          // Console Firebase → Configurações do projeto → apiKey
+      authDomain:'taniaparfum233.firebaseapp.com',
+      databaseURL:'https://taniaparfum233-default-rtdb.firebaseio.com/',
+      projectId:'taniaparfum233'
+    });
+    _fbAuth=firebase.auth(_fbApp);
+
+    // Detecta resultado de redirect (mobile)
+    _fbAuth.getRedirectResult().then(function(result){
+      if(result&&result.user) _mostrarLogin('Login realizado!');
+    }).catch(function(err){
+      if(err.code!=='auth/no-auth-event') _mostrarLogin('Erro no redirect: '+err.message,true);
+    });
+
+    _fbAuth.onAuthStateChanged(_onAuthStateChanged);
+    _mostrarLogin('Pronto para login.');
+    setFbStatus(true,'Firebase aguardando login...');
+  }catch(e){
+    setFbStatus(false,'Erro Firebase: '+e.message);
+    _mostrarLogin('Erro ao carregar Firebase.',true);
+    // Sem Firebase: libera o app mesmo assim
+    var ls=document.getElementById('login-screen');
+    if(ls){ls.classList.add('hide');setTimeout(function(){ls.style.display='none';},400);}
+  }
+}
+
+function _iniciarListenersFB(db){
+  setFbStatus(true,'Firebase conectando...');
+
+    // Listener: esgotados → sincroniza com localStorage
+    db.ref('esgotados').on('value',function(snap){
+      setFbStatus(true,'Firebase ✓ conectado');
+      var data=snap.val()||{};
+      var mudou=false;
+      getAllProducts().forEach(function(p){
+        var novoVal=data[p.id]===true;
+        var atualVal=!!S.sold[p.id];
+        if(novoVal!==atualVal){if(novoVal)S.sold[p.id]=true;else delete S.sold[p.id];mudou=true;}
+      });
+      if(mudou)renderAll();
+    },function(err){
+      setFbStatus(false,'Firebase erro: '+err.code);
+    });
+
+    // Listener: produtos_custom
+    db.ref('produtos_custom').once('value',function(snap){
+      var data=snap.val()||{};
+      var fbIds=Object.keys(data).map(Number);
+      if(!S.customProducts)S.customProducts=[];
+      var localIds=S.customProducts.map(function(p){return p.id;});
+      var novos=0,atualizados=0;
+      fbIds.forEach(function(id){
+        var p=data[id];
+        if(!p)return;
+        var idx=localIds.indexOf(id);
+        if(idx<0){
+          S.customProducts.push({id:p.id,name:p.name,brand:p.brand,category:p.category,sub:p.sub||'',custom:true,foto:p.foto||'',catalogTab:p.catalogTab||'todos'});
+          localIds.push(id);novos++;
+        } else {
+          var local=S.customProducts[idx];
+          if(p.foto)local.foto=p.foto;if(p.name)local.name=p.name;
+          if(p.brand)local.brand=p.brand;if(p.sub)local.sub=p.sub;
+          if(p.category)local.category=p.category;if(p.catalogTab)local.catalogTab=p.catalogTab;
+          atualizados++;
+        }
+        if(p.price)S.prices[p.id]=p.price;
+      });
+      if(novos>0||atualizados>0){save();renderAll();renderProdTab();
+        if(novos>0)toastMsg(novos+' produto(s) novo(s) sincronizado(s) do Firebase');}
+    });
+
+    // Listener: produtos_estaticos
+    db.ref('produtos_estaticos').on('value',function(snap){
+      var data=snap.val()||{};
+      if(!S.customProducts)S.customProducts=[];
+      var localIds=S.customProducts.map(function(p){return p.id;});
+      var updated=0,novos=0;
+      Object.keys(data).forEach(function(id){
+        var p=data[id];if(!p)return;
+        var pid=parseInt(id);
+        var idx=localIds.indexOf(pid);
+        if(idx>=0){
+          var local=S.customProducts[idx];
+          if(p.foto)local.foto=p.foto;if(p.sub)local.sub=p.sub;
+          if(p.name)local.name=p.name;if(p.brand)local.brand=p.brand;
+          if(p.category)local.category=p.category;
+          if(p.catalogTab)local.catalogTab=p.catalogTab;
+          if(p.catalogTabs&&p.catalogTabs.length){local.catalogTabs=p.catalogTabs;}
+          else if(p.catalogTab){local.catalogTabs=[p.catalogTab];}
+          updated++;
+        } else {
+          S.customProducts.push({id:pid,name:p.name||'',brand:p.brand||'',category:p.category||'feminino',
+            sub:p.sub||'',foto:p.foto||'',catalogTab:p.catalogTab||'todos',
+            catalogTabs:p.catalogTabs&&p.catalogTabs.length?p.catalogTabs:[p.catalogTab||'todos'],custom:true});
+          localIds.push(pid);novos++;
+        }
+        if(p.price)S.prices[pid]=p.price;
+      });
+      if(updated>0||novos>0){save();renderAll();renderProdTab();}
+    });
+
+    // Listener: precos
+    db.ref('precos').on('value',function(snap){
+      var data=snap.val()||{};
+      Object.keys(data).forEach(function(id){
+        var numId=Number(id);
+        if(data[id]>0)S.prices[numId]=data[id];
+      });
+    });
+}
+
 (function tentarIniciar(n){
   if(typeof firebase!=="undefined"&&firebase.initializeApp){
     iniciarFirebase();
@@ -3612,6 +3893,9 @@ function savePagMeta(){
     setTimeout(function(){tentarIniciar(n-1);},200);
   } else {
     if(typeof setFbStatus==="function") setFbStatus(false,"Firebase SDK nao carregou");
+    // libera o app sem Firebase
+    var ls=document.getElementById('login-screen');
+    if(ls){ls.classList.add('hide');setTimeout(function(){ls.style.display='none';},400);}
   }
 })(20);
 </script>
