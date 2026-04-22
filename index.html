@@ -3775,10 +3775,14 @@ function _onAuthStateChanged(user){
 function iniciarFirebase(){
   try{
     _fbApp=firebase.initializeApp({
-      apiKey:'COLE_SUA_API_KEY_AQUI',          // Console Firebase → Configurações do projeto → apiKey
+      apiKey:'AIzaSyCNLdocg2_zLyRM8DnTvPJ96gT8lygORL0',
       authDomain:'taniaparfum233.firebaseapp.com',
-      databaseURL:'https://taniaparfum233-default-rtdb.firebaseio.com/',
-      projectId:'taniaparfum233'
+      databaseURL:'https://taniaparfum233-default-rtdb.firebaseio.com',
+      projectId:'taniaparfum233',
+      storageBucket:'taniaparfum233.firebasestorage.app',
+      messagingSenderId:'507989709070',
+      appId:'1:507989709070:web:0fba3805e64ac5f14a875f',
+      measurementId:'G-X5JMZRQDQS'
     });
     _fbAuth=firebase.auth(_fbApp);
 
