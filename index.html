@@ -353,6 +353,14 @@ input,select{font-family:'Montserrat',sans-serif}
 /* ── HISTÓRICO DE PARCELAS ── */
 .parc-hist-item{font-size:0.44rem;color:rgba(125,216,125,0.6);letter-spacing:0.1em;margin-top:2px}
 
+/* ── MULTI FOTOS ── */
+.fotos-grid{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;}
+.foto-thumb-wrap{position:relative;width:72px;height:72px;flex-shrink:0;}
+.foto-thumb-wrap img{width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid rgba(201,168,76,0.3);display:block;}
+.foto-thumb-del{position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:#c85050;border:none;color:#fff;font-size:0.6rem;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1;}
+.foto-add-btn{width:72px;height:72px;border-radius:6px;border:1px dashed rgba(201,168,76,0.3);background:rgba(201,168,76,0.05);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:rgba(201,168,76,0.5);font-size:1.2rem;gap:3px;flex-shrink:0;}
+.foto-add-btn span{font-size:0.38rem;letter-spacing:0.18em;text-transform:uppercase;}
+
 /* ── PROD TAB ── */
 .cprod-card{background:#111;border:1px solid rgba(201,168,76,0.12);border-radius:8px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
 .cprod-info{flex:1;min-width:0}
@@ -767,26 +775,35 @@ input,select{font-family:'Montserrat',sans-serif}
     <div class="modal-title">Novo Produto</div>
     <div class="modal-sub">Preencha as informações</div>
 
-    <!-- FOTO PRIMEIRO + botão IA -->
+    <!-- FOTOS DO PRODUTO (múltiplas) -->
     <div class="modal-field">
-      <div class="modal-field-lbl">URL da Foto <span style="color:rgba(240,232,220,0.25);font-size:0.4rem;"> — cole o link do imgbb</span></div>
-      <input id="ap-foto" class="modal-input" type="url" placeholder="https://i.ibb.co/...">
-      <div id="ap-foto-preview" style="margin-top:8px;display:none;align-items:flex-start;gap:10px;">
-        <img id="ap-foto-img" src="" alt="Preview" style="width:80px;height:80px;object-fit:cover;border-radius:5px;border:1px solid rgba(201,168,76,0.3);flex-shrink:0;">
-        <div style="flex:1;">
-          <input id="ap-ai-dica" class="modal-input" type="text"
-            placeholder="Dica (opcional): ex: kit c/ hidratante baunilha + body splash"
-            style="font-size:0.62rem;padding:7px 10px;margin-bottom:6px;border-color:rgba(201,168,76,0.18);color:rgba(240,232,220,0.6);">
-          <button type="button" id="ap-ai-btn" onclick="analisarFotoIA()" style="width:100%;padding:9px 12px;background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.08));border:1px solid rgba(201,168,76,0.4);border-radius:6px;color:#e8c97a;font-size:0.55rem;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.2s;">
-            <span id="ap-ai-icon">✦</span> <span id="ap-ai-txt">Analisar com IA</span>
-          </button>
-          <div id="ap-ai-status" style="font-size:0.46rem;letter-spacing:0.14em;color:rgba(201,168,76,0.5);text-align:center;margin-top:5px;display:none;"></div>
+      <div class="modal-field-lbl">Fotos do Produto <span style="color:rgba(240,232,220,0.25);font-size:0.4rem;"> — 1ª foto é a principal</span></div>
+
+      <!-- Grid de fotos adicionadas -->
+      <div class="fotos-grid" id="ap-fotos-grid"></div>
+
+      <!-- Área para adicionar nova foto -->
+      <div id="ap-add-foto-area" style="margin-top:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:10px;">
+        <div style="font-size:0.42rem;letter-spacing:0.22em;text-transform:uppercase;color:rgba(201,168,76,0.45);margin-bottom:7px;">Adicionar foto</div>
+        <input id="ap-foto" class="modal-input" type="url" placeholder="https://i.ibb.co/..." style="margin-bottom:7px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <input type="file" id="ap-foto-file" accept="image/*" style="display:none" onchange="handleApFotoUpload(this)">
+          <button type="button" onclick="document.getElementById('ap-foto-file').click()" style="padding:7px 12px;background:rgba(255,255,255,0.04);border:1px dashed rgba(201,168,76,0.2);border-radius:6px;color:rgba(240,232,220,0.35);font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">📷 Do celular</button>
+          <button type="button" onclick="apAdicionarFoto()" style="flex:1;padding:7px 12px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:6px;color:#e8c97a;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;">+ Adicionar</button>
         </div>
-      </div>
-      <div style="margin-top:7px;display:flex;align-items:center;gap:8px;">
-        <input type="file" id="ap-foto-file" accept="image/*" style="display:none" onchange="handleApFotoUpload(this)">
-        <button type="button" onclick="document.getElementById('ap-foto-file').click()" style="padding:7px 12px;background:rgba(255,255,255,0.04);border:1px dashed rgba(201,168,76,0.2);border-radius:6px;color:rgba(240,232,220,0.35);font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;white-space:nowrap;">📷 Usar foto do celular</button>
-        <span style="font-size:0.44rem;color:rgba(240,232,220,0.2);letter-spacing:0.1em;">a IA também analisa</span>
+        <!-- Preview da foto sendo adicionada + botão IA -->
+        <div id="ap-foto-preview" style="display:none;align-items:flex-start;gap:10px;">
+          <img id="ap-foto-img" src="" alt="Preview" style="width:64px;height:64px;object-fit:cover;border-radius:5px;border:1px solid rgba(201,168,76,0.3);flex-shrink:0;">
+          <div style="flex:1;">
+            <input id="ap-ai-dica" class="modal-input" type="text"
+              placeholder="Dica (opcional): ex: kit c/ hidratante baunilha + body splash"
+              style="font-size:0.62rem;padding:7px 10px;margin-bottom:6px;border-color:rgba(201,168,76,0.18);color:rgba(240,232,220,0.6);">
+            <button type="button" id="ap-ai-btn" onclick="analisarFotoIA()" style="width:100%;padding:9px 12px;background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.08));border:1px solid rgba(201,168,76,0.4);border-radius:6px;color:#e8c97a;font-size:0.55rem;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.2s;">
+              <span id="ap-ai-icon">✦</span> <span id="ap-ai-txt">Analisar com IA</span>
+            </button>
+            <div id="ap-ai-status" style="font-size:0.46rem;letter-spacing:0.14em;color:rgba(201,168,76,0.5);text-align:center;margin-top:5px;display:none;"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -850,9 +867,22 @@ input,select{font-family:'Montserrat',sans-serif}
       </div>
     </div>
     <div class="modal-field">
-      <div class="modal-field-lbl">URL da Foto <span style="color:rgba(240,232,220,0.25);font-size:0.4rem;"> — cole o link do imgbb</span></div>
-      <input id="ep-foto" class="modal-input" type="url" placeholder="https://i.ibb.co/...">
-      <div id="ep-foto-preview" style="margin-top:6px;display:none;"><img id="ep-foto-img" src="" alt="Preview" style="width:80px;height:80px;object-fit:cover;border-radius:5px;border:1px solid rgba(201,168,76,0.3);"></div>
+      <div class="modal-field-lbl">Fotos do Produto <span style="color:rgba(240,232,220,0.25);font-size:0.4rem;"> — 1ª foto é a principal</span></div>
+      <!-- Grid de fotos adicionadas -->
+      <div class="fotos-grid" id="ep-fotos-grid"></div>
+      <!-- Área para adicionar nova foto -->
+      <div id="ep-add-foto-area" style="margin-top:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:10px;">
+        <div style="font-size:0.42rem;letter-spacing:0.22em;text-transform:uppercase;color:rgba(201,168,76,0.45);margin-bottom:7px;">Adicionar foto</div>
+        <input id="ep-foto" class="modal-input" type="url" placeholder="https://i.ibb.co/..." style="margin-bottom:7px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="file" id="ep-foto-file" accept="image/*" style="display:none" onchange="handleEpFotoUpload(this)">
+          <button type="button" onclick="document.getElementById('ep-foto-file').click()" style="padding:7px 12px;background:rgba(255,255,255,0.04);border:1px dashed rgba(201,168,76,0.2);border-radius:6px;color:rgba(240,232,220,0.35);font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;white-space:nowrap;flex-shrink:0;">📷 Do celular</button>
+          <button type="button" onclick="epAdicionarFoto()" style="flex:1;padding:7px 12px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:6px;color:#e8c97a;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;">+ Adicionar</button>
+        </div>
+        <div id="ep-foto-preview" style="margin-top:8px;display:none;">
+          <img id="ep-foto-img" src="" alt="Preview" style="width:64px;height:64px;object-fit:cover;border-radius:5px;border:1px solid rgba(201,168,76,0.3);">
+        </div>
+      </div>
     </div>
     <div class="modal-field">
       <div class="modal-field-lbl">Categoria (Gestão) <span style="color:rgba(240,232,220,0.2);font-size:0.38rem;letter-spacing:0.1em;">— pode selecionar várias</span> <span id="ep-cat-lbl" style="color:#C9A84C;font-size:0.42rem;"></span></div>
@@ -2744,7 +2774,6 @@ function renderCobrancas(){
 // ── PRODUTOS CUSTOMIZADOS ─────────────────────────────────────────────────────
 var _apCats=['feminino'];
 var _apAbas=['todos'];
-var _apFotoBase64 = null;
 
 var ABAS_CATALOGO=[
   {id:'todos',      label:'Todos'},
@@ -2823,6 +2852,7 @@ function openAddProdModal(){
   _apCats=['feminino'];
   _apAbas=['todos'];
   _apFotoBase64=null;
+  _apFotos=[];
   document.getElementById('ap-name').value='';
   document.getElementById('ap-brand').value='';
   document.getElementById('ap-sub').value='';
@@ -2837,6 +2867,7 @@ function openAddProdModal(){
   var aiStatus=document.getElementById('ap-ai-status');if(aiStatus)aiStatus.style.display='none';
   var fi=document.getElementById('ap-foto-file');if(fi)fi.value='';
   var dica=document.getElementById('ap-ai-dica');if(dica)dica.value='';
+  renderApFotosGrid();
   renderApCats();
   renderApAbas();
   document.getElementById('modal-add-prod').classList.add('open');
@@ -2893,23 +2924,24 @@ function saveNewProd(){
   var name=document.getElementById('ap-name').value.trim();
   var brand=document.getElementById('ap-brand').value.trim();
   var sub=document.getElementById('ap-sub').value.trim();
-  var fotoUrl=document.getElementById('ap-foto').value.trim();
-  var foto=fotoUrl||(_apFotoBase64||'');
+  var foto=_apFotos.length>0?_apFotos[0].url:'';
   var price=parseFloat(String(document.getElementById('ap-price').value).replace(',','.'))||0;
   if(!name){document.getElementById('ap-name').focus();return;}
   if(!brand){document.getElementById('ap-brand').focus();return;}
   if(!S.customProducts)S.customProducts=[];
   var usedIds=getAllProducts().map(function(p){return p.id;});
   var nid=1000;while(usedIds.indexOf(nid)>=0)nid++;
-  var newProd={id:nid,name:name,brand:brand,category:_apCats.join(' '),categories:_apCats.slice(),sub:sub,custom:true,foto:foto,catalogTab:_apAbas[0],catalogTabs:_apAbas.slice()};
+  var newProd={id:nid,name:name,brand:brand,category:_apCats.join(' '),categories:_apCats.slice(),sub:sub,custom:true,foto:foto,fotos:_apFotos.map(function(f){return f.url;}),catalogTab:_apAbas[0],catalogTabs:_apAbas.slice()};
   S.customProducts.push(newProd);
   if(price>0)S.prices[nid]=price;
   save();
+  var fotoUrl=_apFotos.length>0&&!_apFotos[0].base64only?_apFotos[0].url:'';
   if(window._fbdb && fotoUrl){
     var mostrarP=getMostrarPrecos();
+    var fotosUrls=_apFotos.filter(function(f){return !f.base64only;}).map(function(f){return f.url;});
     window._fbdb.ref('produtos_custom/'+nid).set({
       id:nid,name:name,brand:brand,category:_apCats.join(' '),categories:_apCats.slice(),sub:sub,
-      foto:fotoUrl,price:(mostrarP&&price)?price:null,catalogTab:_apAbas[0],catalogTabs:_apAbas.slice(),custom:true
+      foto:fotoUrl,fotos:fotosUrls,price:(mostrarP&&price)?price:null,catalogTab:_apAbas[0],catalogTabs:_apAbas.slice(),custom:true
     }).then(function(){
       toastMsg('✓ Produto publicado no catálogo!');
     }).catch(function(err){
@@ -2922,6 +2954,45 @@ function saveNewProd(){
   document.getElementById('modal-add-prod').classList.remove('open');
   renderAll();renderProdTab();
   if(!foto) toastMsg('✓ Salvo! Adicione uma foto para publicar no catálogo.');
+}
+
+// ── MÚLTIPLAS FOTOS — ADICIONAR PRODUTO ──────────────────────────────────────
+var _apFotoBase64=null;
+var _apFotos=[];
+
+function renderApFotosGrid(){
+  var grid=document.getElementById('ap-fotos-grid');
+  if(!grid)return;
+  if(!_apFotos.length){grid.innerHTML='<div style="font-size:0.5rem;color:rgba(240,232,220,0.2);letter-spacing:0.18em;text-transform:uppercase;padding:4px 0;">Nenhuma foto adicionada</div>';return;}
+  grid.innerHTML=_apFotos.map(function(f,i){
+    return '<div class="foto-thumb-wrap">'+
+      '<img src="'+f.url+'" alt="foto '+(i+1)+'" loading="lazy">'+
+      (i===0?'<div style="position:absolute;bottom:2px;left:2px;background:rgba(201,168,76,0.85);color:#080808;font-size:0.32rem;letter-spacing:0.1em;padding:1px 4px;border-radius:2px;text-transform:uppercase;">Principal</div>':'')+
+      '<button class="foto-thumb-del" onclick="apRemoverFoto('+i+')" title="Remover">✕</button>'+
+    '</div>';
+  }).join('');
+}
+
+function apAdicionarFoto(){
+  var url=(document.getElementById('ap-foto').value||'').trim();
+  if(!url&&!_apFotoBase64){toastMsg('⚠ Cole uma URL ou escolha uma foto do celular',true);return;}
+  var entry=_apFotoBase64?{url:_apFotoBase64,base64only:true}:{url:url,base64only:false};
+  _apFotos.push(entry);
+  document.getElementById('ap-foto').value='';
+  document.getElementById('ap-foto-preview').style.display='none';
+  _apFotoBase64=null;
+  var fi=document.getElementById('ap-foto-file');if(fi)fi.value='';
+  var aiBtn=document.getElementById('ap-ai-btn');
+  if(aiBtn){aiBtn.style.background='';aiBtn.style.borderColor='';aiBtn.style.color='#e8c97a';}
+  var aiIcon=document.getElementById('ap-ai-icon');if(aiIcon)aiIcon.textContent='✦';
+  var aiTxt=document.getElementById('ap-ai-txt');if(aiTxt)aiTxt.textContent='Analisar com IA';
+  var aiStatus=document.getElementById('ap-ai-status');if(aiStatus)aiStatus.style.display='none';
+  renderApFotosGrid();
+}
+
+function apRemoverFoto(i){
+  _apFotos.splice(i,1);
+  renderApFotosGrid();
 }
 
 // ── UPLOAD DE FOTO DO CELULAR ─────────────────────────────────────────────────
@@ -2937,6 +3008,58 @@ function handleApFotoUpload(input){
     prev.style.display='flex';
     document.getElementById('ap-foto').value='';
     document.getElementById('ap-foto').placeholder='(foto carregada do celular)';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── MÚLTIPLAS FOTOS — EDITAR PRODUTO ─────────────────────────────────────────
+var _epFotoBase64=null;
+var _epFotos=[];
+
+function renderEpFotosGrid(){
+  var grid=document.getElementById('ep-fotos-grid');
+  if(!grid)return;
+  if(!_epFotos.length){grid.innerHTML='<div style="font-size:0.5rem;color:rgba(240,232,220,0.2);letter-spacing:0.18em;text-transform:uppercase;padding:4px 0;">Nenhuma foto adicionada</div>';return;}
+  grid.innerHTML=_epFotos.map(function(f,i){
+    return '<div class="foto-thumb-wrap">'+
+      '<img src="'+f.url+'" alt="foto '+(i+1)+'" loading="lazy">'+
+      (i===0?'<div style="position:absolute;bottom:2px;left:2px;background:rgba(201,168,76,0.85);color:#080808;font-size:0.32rem;letter-spacing:0.1em;padding:1px 4px;border-radius:2px;text-transform:uppercase;">Principal</div>':'')+
+      '<button class="foto-thumb-del" onclick="epRemoverFoto('+i+')" title="Remover">✕</button>'+
+    '</div>';
+  }).join('');
+}
+
+function epAdicionarFoto(){
+  var url=(document.getElementById('ep-foto').value||'').trim();
+  if(!url&&!_epFotoBase64){toastMsg('⚠ Cole uma URL ou escolha uma foto do celular',true);return;}
+  var entry=_epFotoBase64?{url:_epFotoBase64,base64only:true}:{url:url,base64only:false};
+  _epFotos.push(entry);
+  document.getElementById('ep-foto').value='';
+  document.getElementById('ep-foto-preview').style.display='none';
+  _epFotoBase64=null;
+  var fi=document.getElementById('ep-foto-file');if(fi)fi.value='';
+  renderEpFotosGrid();
+  document.getElementById('ep-sem-foto-aviso').style.display=_epFotos.length?'none':'block';
+}
+
+function epRemoverFoto(i){
+  _epFotos.splice(i,1);
+  renderEpFotosGrid();
+  document.getElementById('ep-sem-foto-aviso').style.display=_epFotos.length?'none':'block';
+}
+
+function handleEpFotoUpload(input){
+  var file=input.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    _epFotoBase64=e.target.result;
+    var img=document.getElementById('ep-foto-img');
+    var prev=document.getElementById('ep-foto-preview');
+    img.src=_epFotoBase64;
+    prev.style.display='block';
+    document.getElementById('ep-foto').value='';
+    document.getElementById('ep-foto').placeholder='(foto carregada do celular)';
   };
   reader.readAsDataURL(file);
 }
@@ -2997,7 +3120,7 @@ async function analisarFotoIA(){
       resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+modelo+':generateContent?key='+GEMINI_KEY,{
         method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
-          contents:[{parts:[imagePart,{text:'Você é um especialista em cosméticos brasileiros (O Boticário, Eudora, Natura, Avon, etc) E também um naming expert de perfumaria — cria nomes POÉTICOS e EVOCATIVOS como os de coleções de perfume de luxo. Analise esta foto de produto com atenção máxima.\n\nPRIMEIRO, identifique se é:\n(A) PRODUTO ÚNICO/KIT DE FÁBRICA — um perfume sozinho, um creme, ou um kit oficial da marca (ex: \"Kit Presente Malbec\" da marca)\n(B) KIT MONTADO/CESTA PRESENTE — combinação artesanal de 2+ itens embalada com celofane, laço, fita, tag, papel crepom, caneca, flores, etc\n\nResponda SOMENTE com JSON válido, sem markdown:\n{\"nome\":\"ver regra abaixo\",\"marca\":\"marca do item principal (ou \'Montagem Especial\' se for kit montado sem marca dominante)\",\"descricao\":\"ver regra abaixo\",\"categorias\":[\"cat1\",\"cat2\"],\"abas\":[\"aba1\",\"aba2\"]}\n\nREGRA DO CAMPO \"nome\" (CRÍTICA):\n• Se for (A) produto único/kit de fábrica → use o nome oficial e exato do produto. Ex: \"Malbec Desodorante Colônia 100ml\", \"Kit Lily Eau de Parfum\"\n• Se for (B) kit montado → CRIE um nome POÉTICO e EVOCATIVO de EXATAMENTE 2 palavras (substantivo + adjetivo, ou dois substantivos). NÃO use palavras genéricas tipo \"Mimo\", \"Presente\", \"Kit\", \"Cesta\", \"Surpresa\", \"Especial\". NÃO inclua emoji. NÃO liste produtos. Use linguagem sensorial, afetiva e refinada — como nome de coleção de perfume de luxo.\n\n• TÉCNICA: identifique os AROMAS, CORES e SENSAÇÕES visíveis nos produtos (nome da linha no rótulo, cor da embalagem, tipo de fragrância) e traduza isso em 2 palavras evocativas.\n\n• EXEMPLOS REAIS (siga este estilo):\n  - Kit com Body Splash \"Boa Noite\" + hidratante violeta escuro → \"Noite Encantada\"\n  - Kit com Body Splash Maracujá + hidratante Baunilha (tons amarelos, frutais) → \"Frescor Tropical\"\n  - Kit floral rosa com rosas/peônias → \"Jardim Secreto\" ou \"Flor Desperta\"\n  - Kit com Lily ou branco/dourado → \"Brilho Eterno\" ou \"Luz Suave\"\n  - Kit com Cuide-se Bem amêndoas/vanilla → \"Doce Abraço\" ou \"Aconchego Quente\"\n  - Kit vermelho romântico com corações → \"Paixão Intensa\" ou \"Encanto Ardente\"\n  - Kit masculino tons escuros/amadeirados → \"Força Serena\" ou \"Elegância Noturna\"\n  - Kit com frutas vermelhas (cranberry, framboesa) → \"Beijo Rubi\" ou \"Sedução Doce\"\n  - Kit cítrico (limão, laranja) → \"Manhã Radiante\" ou \"Energia Viva\"\n  - Kit flor de cerejeira / oriental → \"Pétala Delicada\" ou \"Sonho Oriental\"\n  - Kit lavanda/relaxante → \"Calmaria Suave\" ou \"Paz Profunda\"\n  - Kit Natal → \"Estrela Dourada\" ou \"Magia Natalina\"\n  - Kit infantil → \"Doce Infância\" ou \"Sonho Travesso\"\n  - Kit sem tema claro → invente algo atmosférico: \"Véu Dourado\", \"Brisa Suave\", \"Instante Raro\"\n\n• REGRAS RÍGIDAS:\n  - SEMPRE 2 palavras (nem 1, nem 3, nem 4)\n  - Primeira letra de cada palavra MAIÚSCULA\n  - Use português brasileiro poético\n  - Evite clichês batidos (\"Amor de Mãe\", \"Carinho Eterno\")\n  - Seja ORIGINAL — cada kit merece um nome único baseado no que você VÊ na foto\n\nREGRA DO CAMPO \"descricao\":\n• Sempre detalhada, listando os itens identificados. Ex: \"Boa Noite Body Splash + Hidratante Ameixa e Praliné\", \"Maracujá Body Splash + Hidratante Baunilha\", \"Body Spray Magnific 100ml + Caneca \'Melhor Mãe do Mundo\'\". Seja específica com nomes de linha/fragrância quando visíveis no rótulo.\n\nRegras para categorias (pode ter VÁRIAS):\n- \"feminino\" = produto para mulher (perfume fem, creme, sabonete fem)\n- \"masculino\" = produto para homem\n- \"kit\" = conjunto com 2+ itens (inclui kits montados)\n- \"hidratante\" = creme, loção, sabonete, óleo corporal, body splash\n- \"kids\" = infantil/bebê\nEx: kit montado feminino com body splash e hidratante → [\"kit\",\"feminino\",\"hidratante\"]\n\nRegras para abas (SEMPRE use array, pode ter VÁRIAS abas):\n- \"todos\" = SEMPRE inclua em todos os produtos (aba geral)\n- \"colecao\" = lançamento recente, edição especial, linha premium\n- \"maes\" = kit ou produto temático Dia das Mães (caneca \'mãe\', tag \'mamãe\', embalagem temática)\n- \"beleza\" = produtos de beleza e cuidados gerais, produtos kids/bebê\n- \"maquiagens\" = batom, base, sombra, blush, delineador\n- \"infantis\" = exclusivamente para bebê ou criança pequena\nExemplos:\n- Perfume feminino normal → [\"todos\"]\n- Kit montado tema Dia das Mães → [\"todos\",\"maes\"]\n- Kit montado genérico → [\"todos\"]\n- Colônia infantil → [\"todos\",\"beleza\",\"infantis\"]'+dicaTxt}]}],
+          contents:[{parts:[imagePart,{text:'Você é um especialista em cosméticos brasileiros (O Boticário, Eudora, Natura, Avon, etc) E também um naming expert de perfumaria — cria nomes POÉTICOS e EVOCATIVOS como os de coleções de perfume de luxo. Analise esta foto de produto com atenção máxima.\n\nPRIMEIRO, identifique se é:\n(A) PRODUTO ÚNICO/KIT DE FÁBRICA — um perfume sozinho, um creme, ou um kit oficial da marca (ex: \"Kit Presente Malbec\" da marca)\n(B) KIT MONTADO/CESTA PRESENTE — combinação artesanal de 2+ itens embalada com celofane, laço, fita, tag, papel crepom, caneca, flores, etc\n\nResponda SOMENTE com JSON válido, sem markdown:\n{\"nome\":\"ver regra abaixo\",\"marca\":\"marca do item principal (ou \'Montagem Especial\' se for kit montado sem marca dominante)\",\"descricao\":\"ver regra abaixo\",\"categorias\":[\"cat1\",\"cat2\"],\"abas\":[\"aba1\",\"aba2\"]}\n\nREGRA DO CAMPO \"nome\" (CRÍTICA):\n• Se for (A) produto único/kit de fábrica → use APENAS o nome comercial do produto, SEM tipo, SEM volume, SEM \"Deo Parfum\", SEM \"ml\". Ex: \"Malbec\", \"Glamour Secret Black\", \"Kit Lily\", \"Egeo Choc\"\n• Se for (B) kit montado → CRIE um nome POÉTICO e EVOCATIVO de 2 a 3 palavras (substantivo + adjetivo, ou combinações evocativas). NÃO use palavras genéricas tipo \"Mimo\", \"Presente\", \"Kit\", \"Cesta\", \"Surpresa\", \"Especial\". NÃO inclua emoji. NÃO liste produtos. Use linguagem sensorial, afetiva e refinada — como nome de coleção de perfume de luxo.\n\n• TÉCNICA para kits montados: identifique os AROMAS, CORES e SENSAÇÕES visíveis nos produtos (nome da linha no rótulo, cor da embalagem, tipo de fragrância) e traduza isso em 2 ou 3 palavras evocativas.\n\n• EXEMPLOS REAIS para kits montados (siga este estilo):\n  - Kit com Body Splash \"Boa Noite\" + hidratante violeta escuro → \"Noite Encantada\"\n  - Kit com Body Splash Maracujá + hidratante Baunilha (tons amarelos, frutais) → \"Frescor Tropical\"\n  - Kit floral rosa com rosas/peônias → \"Jardim Secreto\" ou \"Flor Desperta\"\n  - Kit com Lily ou branco/dourado → \"Brilho Eterno\" ou \"Luz Suave\"\n  - Kit com Cuide-se Bem amêndoas/vanilla → \"Doce Abraço\" ou \"Aconchego Quente\"\n  - Kit vermelho romântico com corações → \"Paixão Intensa\" ou \"Encanto Ardente\"\n  - Kit masculino tons escuros/amadeirados → \"Força Serena\" ou \"Elegância Noturna\"\n  - Kit com frutas vermelhas (cranberry, framboesa) → \"Beijo Rubi\" ou \"Sedução Doce\"\n  - Kit cítrico (limão, laranja) → \"Manhã Radiante\" ou \"Energia Viva\"\n  - Kit flor de cerejeira / oriental → \"Pétala Delicada\" ou \"Sonho Oriental\"\n  - Kit lavanda/relaxante → \"Calmaria Suave\" ou \"Paz Profunda\"\n  - Kit Natal → \"Estrela Dourada\" ou \"Magia Natalina\"\n  - Kit infantil → \"Doce Infância\" ou \"Sonho Travesso\"\n  - Kit sem tema claro → invente algo atmosférico: \"Véu Dourado\", \"Brisa Suave\", \"Instante Raro\"\n\n• REGRAS RÍGIDAS para kits montados:\n  - Entre 2 e 3 palavras (nunca 1, nunca 4 ou mais)\n  - Primeira letra de cada palavra MAIÚSCULA\n  - Use português brasileiro poético\n  - Evite clichês batidos (\"Amor de Mãe\", \"Carinho Eterno\")\n  - Seja ORIGINAL — cada kit merece um nome único baseado no que você VÊ na foto\n\nREGRA DO CAMPO \"descricao\":\n• Para produto único/kit de fábrica: coloque o tipo e volume aqui. Ex: \"Deo Parfum 90ml\", \"Eau de Parfum 50ml\", \"Loção Hidratante Perfumada 200ml\"\n• Para kit montado: liste os itens identificados. Ex: \"Boa Noite Body Splash + Hidratante Ameixa e Praliné\", \"Maracujá Body Splash + Hidratante Baunilha\", \"Body Spray Magnific 100ml + Caneca \'Melhor Mãe do Mundo\'\". Seja específica com nomes de linha/fragrância quando visíveis no rótulo.\n\nRegras para categorias (pode ter VÁRIAS):\n- \"feminino\" = produto para mulher (perfume fem, creme, sabonete fem)\n- \"masculino\" = produto para homem\n- \"kit\" = conjunto com 2+ itens (inclui kits montados)\n- \"hidratante\" = creme, loção, sabonete, óleo corporal, body splash\n- \"kids\" = infantil/bebê\nEx: kit montado feminino com body splash e hidratante → [\"kit\",\"feminino\",\"hidratante\"]\n\nRegras para abas (SEMPRE use array, pode ter VÁRIAS abas):\n- \"todos\" = SEMPRE inclua em todos os produtos (aba geral)\n- \"colecao\" = lançamento recente, edição especial, linha premium\n- \"maes\" = kit ou produto temático Dia das Mães (caneca \'mãe\', tag \'mamãe\', embalagem temática)\n- \"beleza\" = produtos de beleza e cuidados gerais, produtos kids/bebê\n- \"maquiagens\" = batom, base, sombra, blush, delineador\n- \"infantis\" = exclusivamente para bebê ou criança pequena\nExemplos:\n- Perfume feminino normal → [\"todos\"]\n- Kit montado tema Dia das Mães → [\"todos\",\"maes\"]\n- Kit montado genérico → [\"todos\"]\n- Colônia infantil → [\"todos\",\"beleza\",\"infantis\"]'+dicaTxt}]}],
           generationConfig:{temperature:0.1,maxOutputTokens:2048}
         })
       });
@@ -3184,26 +3307,35 @@ function openEditProdModal(id){
   _epCats=p.categories&&p.categories.length?p.categories.slice():[p.category||'feminino'];
   _epAbas=p.catalogTabs&&p.catalogTabs.length?p.catalogTabs.slice():[p.catalogTab||'todos'];
 
+  // Carrega fotos existentes
+  _epFotoBase64=null;
+  _epFotos=[];
+  if(p.fotos&&p.fotos.length){
+    _epFotos=p.fotos.map(function(u){return {url:u,base64only:false};});
+  } else if(p.foto){
+    _epFotos=[{url:p.foto,base64only:false}];
+  }
+
   document.getElementById('ep-sub').textContent=p.name;
   document.getElementById('ep-name').value=p.name;
   document.getElementById('ep-brand').value=p.brand;
   document.getElementById('ep-sub-input').value=p.sub||'';
   document.getElementById('ep-price').value=gp(id)||'';
-  document.getElementById('ep-foto').value=p.foto||'';
+  document.getElementById('ep-foto').value='';
+  document.getElementById('ep-foto-preview').style.display='none';
 
-  var prev=document.getElementById('ep-foto-preview');
-  var img=document.getElementById('ep-foto-img');
-  if(p.foto){img.src=p.foto;prev.style.display='block';}
-  else{prev.style.display='none';}
-
-  document.getElementById('ep-sem-foto-aviso').style.display=p.foto?'none':'block';
+  document.getElementById('ep-sem-foto-aviso').style.display=_epFotos.length?'none':'block';
 
   document.getElementById('ep-foto').oninput=function(){
     var url=this.value.trim();
-    if(url){img.src=url;prev.style.display='block';document.getElementById('ep-sem-foto-aviso').style.display='none';}
-    else{prev.style.display='none';document.getElementById('ep-sem-foto-aviso').style.display='block';}
+    var prev=document.getElementById('ep-foto-preview');
+    var img=document.getElementById('ep-foto-img');
+    _epFotoBase64=null;
+    if(url){img.src=url;prev.style.display='block';}
+    else{prev.style.display='none';}
   };
 
+  renderEpFotosGrid();
   renderEpCats();
   renderEpAbas();
 
@@ -3260,7 +3392,8 @@ function saveEditProd(){
   var name=document.getElementById('ep-name').value.trim();
   var brand=document.getElementById('ep-brand').value.trim();
   var sub=document.getElementById('ep-sub-input').value.trim();
-  var foto=document.getElementById('ep-foto').value.trim();
+  var foto=_epFotos.length>0?_epFotos[0].url:'';
+  var fotosAll=_epFotos.map(function(f){return f.url;});
   var price=parseFloat(String(document.getElementById('ep-price').value).replace(',','.'))||0;
   if(!name){document.getElementById('ep-name').focus();return;}
   if(!brand){document.getElementById('ep-brand').focus();return;}
@@ -3269,7 +3402,7 @@ function saveEditProd(){
   var idx=S.customProducts.findIndex(function(p){return p.id===_epId;});
   if(idx<0){
     var base=PRODUCTS.find(function(x){return x.id===_epId;})||{};
-    S.customProducts.push({id:_epId,name:base.name,brand:base.brand,category:base.category||'feminino',categories:[base.category||'feminino'],sub:base.sub||'',foto:base.foto||'',catalogTab:base.catalogTab||'todos',custom:true});
+    S.customProducts.push({id:_epId,name:base.name,brand:base.brand,category:base.category||'feminino',categories:[base.category||'feminino'],sub:base.sub||'',foto:base.foto||'',fotos:[],catalogTab:base.catalogTab||'todos',custom:true});
     idx=S.customProducts.length-1;
   }
   var prods=S.customProducts;
@@ -3277,6 +3410,7 @@ function saveEditProd(){
   prods[idx].brand=brand;
   prods[idx].sub=sub;
   prods[idx].foto=foto;
+  prods[idx].fotos=fotosAll;
   prods[idx].category=_epCats.join(' ');
   prods[idx].categories=_epCats.slice();
   prods[idx].catalogTab=_epAbas[0];
@@ -3288,20 +3422,19 @@ function saveEditProd(){
   try{
     if(window._fbdb){
       var mostrarP=getMostrarPrecos();
-      // Verifica se o produto era originalmente estático (veio de PRODUCTS ou produtos_estaticos)
       var eraEstatico=PRODUCTS.some(function(x){return x.id===_epId;});
+      var fotoUrl=_epFotos.length>0&&!_epFotos[0].base64only?_epFotos[0].url:'';
+      var fotosUrls=_epFotos.filter(function(f){return !f.base64only;}).map(function(f){return f.url;});
 
-      if(foto){
-        // Sempre grava em produtos_custom (lido tanto pelo catálogo quanto pelo gestão)
+      if(fotoUrl){
         window._fbdb.ref('produtos_custom/'+_epId).set({
           id:_epId,name:name,brand:brand,category:_epCats.join(' '),categories:_epCats.slice(),sub:sub,
-          foto:foto,price:(mostrarP&&price)?price:null,catalogTab:_epAbas[0],catalogTabs:_epAbas.slice(),custom:true
+          foto:fotoUrl,fotos:fotosUrls,price:(mostrarP&&price)?price:null,catalogTab:_epAbas[0],catalogTabs:_epAbas.slice(),custom:true
         });
-        // Se também é estático, atualiza produtos_estaticos para sincronizar as abas lá também
         if(eraEstatico){
           window._fbdb.ref('produtos_estaticos/'+_epId).update({
             catalogTab:_epAbas[0],catalogTabs:_epAbas.slice(),
-            name:name,brand:brand,sub:sub,category:_epCats.join(' '),foto:foto
+            name:name,brand:brand,sub:sub,category:_epCats.join(' '),foto:fotoUrl
           });
         }
         if(mostrarP&&price){
@@ -3309,9 +3442,7 @@ function saveEditProd(){
           window._fbdb.ref('produtos_custom/'+_epId+'/price').set(price);
         }
       } else {
-        // Se não tem foto, remove do catálogo (Firebase)
         window._fbdb.ref('produtos_custom/'+_epId).remove();
-        // Mas se era estático, ainda atualiza as abas em produtos_estaticos
         if(eraEstatico){
           window._fbdb.ref('produtos_estaticos/'+_epId).update({
             catalogTab:_epAbas[0],catalogTabs:_epAbas.slice(),
