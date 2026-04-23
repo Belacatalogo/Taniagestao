@@ -4471,8 +4471,8 @@ async function loteAnalyzeOne(product, mode){
   }
 
   var prompt = mode==='desc'
-    ? 'Produto de perfumaria ou beleza na foto. JSON puro sem markdown: {"sub":"descrição em português, máx 10 palavras"}'
-    : 'Produto de perfumaria ou beleza na foto. Responda SOMENTE com este JSON sem texto extra:\n{"brand":"marca principal","name":"nome comercial","sub":"para produto único: tipo+volume ex Deo Parfum 90ml. para kit montado: liste itens visíveis","badge":"Novo ou Oferta ou vazio","categories":["feminino","kit"],"sections":["todos"],"kitMontado":"sim ou nao"}\n\ncategories pode ter vários: feminino, masculino, kit, hidratante, kids. sections pode ter vários: todos, colecao, maes, beleza. Coloque todos que se encaixam.';
+    ? 'Produto de perfumaria ou beleza na foto. JSON puro sem markdown: {"sub":"descrição completa em português com tipo e volume, ex: Deo Parfum 90ml ou Eau de Parfum 75ml"}'
+    : 'Produto de perfumaria ou beleza na foto. Responda SOMENTE com este JSON sem texto extra:\n{"brand":"marca principal","name":"nome comercial","sub":"OBRIGATÓRIO: tipo completo + volume visível. Ex: Deo Parfum 90ml, Eau de Parfum 75ml, Deo Colônia 100ml, Body Splash 200ml. Para kit montado: liste os itens visíveis. NUNCA deixe vago como só Perfume ou Deo Parfum sem volume.","badge":"Novo ou Oferta ou vazio","categories":["feminino"],"sections":["todos"],"kitMontado":"sim ou nao"}\n\ncategories: feminino, masculino, kit, hidratante, kids — coloque todos que se encaixam.\nsections: todos (sempre incluir), colecao (lançamento/premium), maes (tema Dia das Mães), beleza (cuidados/kids) — coloque todos que se encaixam.';
   var modelo = localStorage.getItem('bela-gemini-modelo') || 'gemini-2.5-flash';
 
   var resp, data, lastErr = '';
@@ -4484,7 +4484,7 @@ async function loteAnalyzeOne(product, mode){
     try {
       resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+modelo+':generateContent?key='+GEMINI_KEY, {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ contents:[{parts:[{inline_data:{mime_type:mt,data:b64}},{text:prompt}]}], generationConfig:{temperature:0.1,maxOutputTokens:1024} })
+        body: JSON.stringify({ contents:[{parts:[{inline_data:{mime_type:mt,data:b64}},{text:prompt}]}], generationConfig:{temperature:0.1,maxOutputTokens:2048} })
       });
       data = await resp.json();
       if (resp.ok) break;
