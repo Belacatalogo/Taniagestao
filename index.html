@@ -4309,9 +4309,15 @@ function loteBuildCard(p){
       '<img src="'+p.previewUrl+'" alt="">' +
       '<div class="lote-card-badge '+sCls[p.status]+'" id="lbadge_'+p.id+'">'+sLbl[p.status]+'</div>' +
       '<div class="lote-card-excl" onclick="loteToggleExclude(\''+p.id+'\')">'+(p.status==='excluded'?'↩':'✕')+'</div>' +
+      (p.cloudinaryUrl ? '<div style="position:absolute;bottom:0;left:0;right:0;padding:4px 6px;background:rgba(37,211,102,0.85);font-size:0.36rem;letter-spacing:0.08em;color:#fff;word-break:break-all;cursor:pointer;" onclick="loteCopyUrl(\''+p.id+'\')" title="Toque para copiar URL">☁ '+p.cloudinaryUrl.replace('https://res.cloudinary.com/','…/')+'</div>' : '') +
     '</div>' +
     '<div class="lote-card-body" id="lcbody_'+p.id+'">' +
-      (p.status==='processing' ? '<div class="ai-bar"></div><div class="shimmer" style="height:9px;width:55%;margin-bottom:5px;border-radius:3px;background:linear-gradient(90deg,rgba(201,168,76,0.07) 25%,rgba(201,168,76,0.16) 50%,rgba(201,168,76,0.07) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;"></div><div class="shimmer" style="height:9px;width:85%;border-radius:3px;background:linear-gradient(90deg,rgba(201,168,76,0.07) 25%,rgba(201,168,76,0.16) 50%,rgba(201,168,76,0.07) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;"></div>' : loteBuildForm(p)) +
+      (p.status==='processing'
+        ? '<div class="ai-bar"></div><div style="height:9px;width:55%;margin-bottom:5px;border-radius:3px;background:linear-gradient(90deg,rgba(201,168,76,0.07) 25%,rgba(201,168,76,0.16) 50%,rgba(201,168,76,0.07) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;"></div><div style="height:9px;width:85%;border-radius:3px;background:linear-gradient(90deg,rgba(201,168,76,0.07) 25%,rgba(201,168,76,0.16) 50%,rgba(201,168,76,0.07) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;"></div>'
+        : p.status==='error'
+          ? '<div style="font-size:0.46rem;color:rgba(220,110,110,0.8);padding:4px 0 8px;letter-spacing:0.08em;line-height:1.4;">⚠ '+(p.errorMsg||'Erro na análise')+'</div>'+
+            '<button class="lote-btn lote-btn-ghost" style="font-size:0.44rem;padding:6px 10px;width:100%;" onclick="loteRetryOne(\''+p.id+'\')">↻ Tentar novamente</button>'
+          : loteBuildForm(p)) +
     '</div>';
   return card;
 }
@@ -4335,6 +4341,20 @@ function loteBuildForm(p){
 }
 
 function loteF(id, field, val){ var p=_loteProducts.find(function(x){return x.id===id;}); if(p) p[field]=val; }
+
+async function loteRetryOne(id){
+  var p=_loteProducts.find(function(x){return x.id===id;}); if(!p) return;
+  p.status='processing'; p.errorMsg='';
+  loteRefreshCard(id); loteUpdateToolbar();
+  var mode=(document.getElementById('loteAiMode')||{}).value||'full';
+  await loteAnalyzeOne(p, mode);
+}
+
+function loteCopyUrl(id){
+  var p=_loteProducts.find(function(x){return x.id===id;}); if(!p||!p.cloudinaryUrl) return;
+  if(navigator.clipboard){ navigator.clipboard.writeText(p.cloudinaryUrl).then(function(){ toastMsg('URL copiada!'); }); }
+  else { var t=document.createElement('textarea');t.value=p.cloudinaryUrl;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t); toastMsg('URL copiada!'); }
+}
 
 function loteToggleExclude(id){
   var p = _loteProducts.find(function(x){return x.id===id;}); if(!p) return;
@@ -4363,28 +4383,65 @@ async function loteAnalyzeAll(){
     loteUpdateToolbar(); return;
   }
   var pending = _loteProducts.filter(function(p){ return p.status==='processing'; });
-  for (var i=0; i<pending.length; i+=3) {
-    await Promise.all(pending.slice(i,i+3).map(function(p){ return loteAnalyzeOne(p, mode); }));
+  // Analisa uma por vez para evitar rate limit do Gemini
+  for (var i=0; i<pending.length; i++) {
+    await loteAnalyzeOne(pending[i], mode);
+    // Pequena pausa entre requisições
+    if (i < pending.length - 1) await new Promise(function(r){ setTimeout(r, 800); });
   }
 }
 
 async function loteAnalyzeOne(product, mode){
+  var GEMINI_KEY = localStorage.getItem('bela-gemini-key') || '';
+  if (!GEMINI_KEY){
+    product.status = 'error';
+    product.errorMsg = 'Chave Gemini não configurada. Vá em ⚙ Backup → IA.';
+    loteRefreshCard(product.id); loteUpdateToolbar(); return;
+  }
+
+  var b64, mt;
   try {
-    var GEMINI_KEY = localStorage.getItem('bela-gemini-key') || '';
-    if (!GEMINI_KEY){ product.status='error'; loteRefreshCard(product.id); loteUpdateToolbar(); return; }
-    var b64 = await loteFileToB64(product.file);
-    var mt  = product.file.type || 'image/jpeg';
-    var prompt = mode==='desc'
-      ? 'Foto de produto de perfumaria/beleza. Responda APENAS com JSON puro sem markdown: {"sub":"descrição elegante em português, máx 12 palavras"}'
-      : 'Foto de produto de perfumaria ou beleza. Responda APENAS com JSON puro sem markdown: {"brand":"marca","name":"nome do produto","sub":"descrição elegante em português máx 12 palavras","volume":"se visível ex 75ml","badge":"Novo ou Oferta ou vazio","category":"feminino|masculino|kit|hidratante|kids","section":"todos|colecao|maes|beleza"}';
-    var modelo = localStorage.getItem('bela-gemini-modelo') || 'gemini-2.5-flash';
-    var resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+modelo+':generateContent?key='+GEMINI_KEY, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ contents:[{parts:[{inline_data:{mime_type:mt,data:b64}},{text:prompt}]}], generationConfig:{temperature:0.1,maxOutputTokens:512} })
-    });
-    var data = await resp.json();
+    b64 = await loteFileToB64(product.file);
+    mt  = product.file.type || 'image/jpeg';
+  } catch(e) {
+    product.status = 'error';
+    product.errorMsg = 'Erro ao ler a imagem.';
+    loteRefreshCard(product.id); loteUpdateToolbar(); return;
+  }
+
+  var prompt = mode==='desc'
+    ? 'Foto de produto de perfumaria/beleza. Responda APENAS com JSON puro sem markdown: {"sub":"descrição elegante em português, máx 12 palavras"}'
+    : 'Foto de produto de perfumaria ou beleza. Responda APENAS com JSON puro sem markdown: {"brand":"marca","name":"nome do produto","sub":"descrição elegante em português máx 12 palavras","volume":"se visível ex 75ml","badge":"Novo ou Oferta ou vazio","category":"feminino|masculino|kit|hidratante|kids","section":"todos|colecao|maes|beleza"}';
+  var modelo = localStorage.getItem('bela-gemini-modelo') || 'gemini-2.5-flash';
+
+  var resp, data, lastErr = '';
+  // Até 3 tentativas com backoff para rate limit
+  for (var tentativa = 0; tentativa < 3; tentativa++) {
+    if (tentativa > 0) {
+      await new Promise(function(r){ setTimeout(r, tentativa * 2500); });
+    }
+    try {
+      resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+modelo+':generateContent?key='+GEMINI_KEY, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ contents:[{parts:[{inline_data:{mime_type:mt,data:b64}},{text:prompt}]}], generationConfig:{temperature:0.1,maxOutputTokens:512} })
+      });
+      data = await resp.json();
+      if (resp.ok) break;
+      var errMsg = (data.error && data.error.message) || ('HTTP '+resp.status);
+      lastErr = errMsg;
+      // Só retenta em rate limit / overload
+      var retentar = resp.status===429 || resp.status===503 || errMsg.toLowerCase().includes('quota') || errMsg.toLowerCase().includes('overload');
+      if (!retentar) break;
+    } catch(e) {
+      lastErr = 'Sem conexão';
+    }
+  }
+
+  try {
+    if (!resp || !resp.ok) throw new Error(lastErr || 'Erro desconhecido');
     var raw = '';
-    try{ raw=data.candidates[0].content.parts[0].text; }catch(e){}
+    try{ raw = data.candidates[0].content.parts[0].text; }catch(e){}
+    if (!raw) throw new Error('Resposta vazia da IA');
     raw = raw.replace(/```json|```/g,'').trim();
     var s=raw.indexOf('{'), en=raw.lastIndexOf('}');
     if(s>=0&&en>s) raw=raw.substring(s,en+1);
@@ -4397,8 +4454,10 @@ async function loteAnalyzeOne(product, mode){
     if(r.category) product.category = r.category;
     if(r.section)  product.section  = r.section;
     product.status = 'ready';
+    product.errorMsg = '';
   } catch(e) {
     product.status = 'error';
+    product.errorMsg = lastErr || e.message || 'Erro na análise';
   }
   loteRefreshCard(product.id);
   loteUpdateToolbar();
@@ -4484,6 +4543,9 @@ async function lotePublishAll(){
   var btn=document.getElementById('loteBtnPublish'); if(btn) btn.disabled=true;
   document.getElementById('lotePublishProgress').style.display='block';
 
+  var cld=_loteGetCld();
+  if(!cld.cloud||!cld.preset){ toastMsg('Configure o Cloudinary na aba ⚙ Backup'); if(btn) btn.disabled=false; return; }
+
   if(_devMode){
     // Dev mode: Cloudinary upload real, Firebase bloqueado
     var done=0, errors=0;
@@ -4493,6 +4555,7 @@ async function lotePublishAll(){
       try{
         var cdnData=await _cloudinaryUpload(cld.cloud,cld.preset,p.file,'tania-parfum');
         p.cloudinaryUrl=cdnData.secure_url;
+        loteRefreshCard(p.id);
         console.log('[DEV] Firebase bloqueado — NÃO gravado:', p.name, cdnData.secure_url);
         done++;
       }catch(err){
@@ -4506,18 +4569,14 @@ async function lotePublishAll(){
     loteGoStep(4); toastMsg('⚙ Dev: '+done+' foto(s) enviadas, Firebase bloqueado'); return;
   }
 
-  // Modo real
-  var cld=_loteGetCld();
-  if(!cld.cloud||!cld.preset){ toastMsg('Configure o Cloudinary na aba ⚙ Backup'); if(btn) btn.disabled=false; return; }
-
   var done=0, errors=0;
   for(var i=0;i<active.length;i++){
     var p=active[i];
     loteSetProgress(i,active.length,'Enviando '+(p.name||'produto')+'...');
     try{
-      // 1. Cloudinary (usa wrapper que respeita dev mode)
       var cdnData=await _cloudinaryUpload(cld.cloud,cld.preset,p.file,'tania-parfum');
       p.cloudinaryUrl=cdnData.secure_url;
+      loteRefreshCard(p.id); // mostra URL no card
       // 2. Firebase
       var newId=Date.now()+i;
       var payload={
