@@ -529,7 +529,7 @@ body.dev-mode .dev-log-box{display:block;}
     </svg>
     Entrar com Google
   </button>
-  <div class="login-status" id="login-status">Carregando...</div>
+  <div class="login-status" id="login-status">Pronto para login.</div>
 </div>
 
 <!-- barra de usuário logado -->
@@ -4125,11 +4125,11 @@ renderPag();
 
 <!-- Firebase SDK (carrega por último para não bloquear o app) -->
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" defer></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js" defer></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js" defer></script>
 
 <script>
 // ── AUTENTICAÇÃO GOOGLE ────────────────────────────────────────────────────
@@ -4880,14 +4880,14 @@ db.ref('precos').on('value',function(snap){
 if(typeof firebase!==“undefined”&&firebase.initializeApp){
 iniciarFirebase();
 } else if(n>0){
-setTimeout(function(){tentarIniciar(n-1);},200);
+setTimeout(function(){tentarIniciar(n-1);},300);
 } else {
 if(typeof setFbStatus===“function”) setFbStatus(false,“Firebase SDK nao carregou”);
 // libera o app sem Firebase
 var ls=document.getElementById(‘login-screen’);
 if(ls){ls.classList.add(‘hide’);setTimeout(function(){ls.style.display=‘none’;},400);}
 }
-})(20);
+})(40);
 </script>
 
 </body>
