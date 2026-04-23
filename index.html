@@ -668,7 +668,6 @@ body.dev-mode .dev-log-box{display:block;}
       </div>
       <div class="lote-section-body">
 
-```
     <div class="lote-steps">
       <div class="lote-step active" id="lStep1"><div class="lote-step-num">1</div><div class="lote-step-lbl">Upload</div></div>
       <div class="lote-step" id="lStep2"><div class="lote-step-num">2</div><div class="lote-step-lbl">Revisar</div></div>
@@ -777,7 +776,6 @@ body.dev-mode .dev-log-box{display:block;}
 
   </div>
 </div>
-```
 
   </div>
 
@@ -873,7 +871,6 @@ body.dev-mode .dev-log-box{display:block;}
   <div class="cfg-section">
     <div class="cfg-section-title">Configurações do Catálogo</div>
 
-```
 <div class="cfg-card">
   <div class="cfg-card-title">💰 Mostrar preços no catálogo</div>
   <div class="cfg-card-desc">Quando ativado, os preços aparecem nos produtos do catálogo para as clientes. Quando desativado, aparece &quot;Consulte&quot; no lugar do preço.</div>
@@ -896,7 +893,6 @@ body.dev-mode .dev-log-box{display:block;}
   <button class="cfg-btn cfg-btn-gold" onclick="sincronizarProdutos()">⟳ Sincronizar produtos agora</button>
   <div class="cfg-last-backup" id="cfg-sync-prod-status"></div>
 </div>
-```
 
   </div>
 
@@ -905,7 +901,6 @@ body.dev-mode .dev-log-box{display:block;}
   <div class="cfg-section">
     <div class="cfg-section-title">🎠 Carrossel da Coleção</div>
 
-```
 <div class="cfg-card">
   <div class="cfg-card-title">✦ Produtos em destaque no carrossel</div>
   <div class="cfg-card-desc">Escolha quais produtos aparecem no carrossel principal da aba <strong style="color:#e8c97a;">Coleção</strong> do catálogo. <strong style="color:#e8c97a;">Ideal: entre 3 e 8 produtos</strong> com fotos bonitas. Toque no produto para adicionar/remover do carrossel.</div>
@@ -924,7 +919,6 @@ body.dev-mode .dev-log-box{display:block;}
     <div class="cfg-last-backup" id="cfg-carr-status"></div>
   </div>
 </div>
-```
 
   </div>
 
@@ -933,7 +927,6 @@ body.dev-mode .dev-log-box{display:block;}
   <div class="cfg-section">
     <div class="cfg-section-title">🎉 Aba Comemorativa</div>
 
-```
 <div class="cfg-card">
   <div class="cfg-card-title">✨ Personalizar aba de datas comemorativas</div>
   <div class="cfg-card-desc">Use esta aba para qualquer data comemorativa: <strong style="color:#e8c97a;">Dia das Mães, Dia dos Pais, Dia das Crianças, Natal, Black Friday</strong> e outras. Mude o nome, emoji e subtítulo conforme a época do ano.</div>
@@ -971,14 +964,12 @@ body.dev-mode .dev-log-box{display:block;}
   <button class="cfg-btn cfg-btn-gold" onclick="salvarAbaComemorativa()">↑ Salvar no catálogo</button>
   <div class="cfg-last-backup" id="cfg-aba-status"></div>
 </div>
-```
 
   </div>
 
   <div class="cfg-section">
     <div class="cfg-section-title">Backup dos Dados</div>
 
-```
 <!-- AUTO BACKUP NA NUVEM -->
 <div class="cfg-card">
   <div class="cfg-card-title">☁️ Backup Automático na Nuvem</div>
@@ -1007,7 +998,6 @@ body.dev-mode .dev-log-box{display:block;}
   <button class="cfg-btn cfg-btn-green" onclick="document.getElementById('import-file-input').click()">⬆ Selecionar arquivo de backup</button>
   <input type="file" id="import-file-input" accept=".json,application/json" onchange="importarDados(this)">
 </div>
-```
 
   </div>
 
@@ -1037,13 +1027,11 @@ body.dev-mode .dev-log-box{display:block;}
       <div class="cfg-info-row"><span class="cfg-info-lbl">Tamanho do backup</span><span class="cfg-info-val" id="cfg-size">—</span></div>
     </div>
 
-```
 <div class="cfg-card">
   <div class="cfg-card-title" style="color:rgba(220,110,110,0.7);">🗑 Apagar todos os dados</div>
   <div class="cfg-card-desc">Remove permanentemente todas as vendas, preços e pagamentos. <strong style="color:rgba(220,110,110,0.7);">Não pode ser desfeito.</strong> Faça um backup antes!</div>
   <button class="cfg-btn cfg-btn-red" onclick="apagarTudo()">Apagar tudo</button>
 </div>
-```
 
   </div>
 
@@ -1143,7 +1131,6 @@ body.dev-mode .dev-log-box{display:block;}
     <div class="modal-title">Novo Produto</div>
     <div class="modal-sub">Preencha as informações</div>
 
-```
 <!-- FOTOS DO PRODUTO (múltiplas) -->
 <div class="modal-field">
   <div class="modal-field-lbl">Fotos do Produto <span style="color:rgba(240,232,220,0.25);font-size:0.4rem;"> — 1ª foto é a principal</span></div>
@@ -1207,7 +1194,6 @@ body.dev-mode .dev-log-box{display:block;}
   <button class="modal-btn-cancel" onclick="closeAddProdModal()">Cancelar</button>
   <button class="modal-btn-save" onclick="saveNewProd()">Salvar & Publicar</button>
 </div>
-```
 
   </div>
 </div>
@@ -2770,7 +2756,6 @@ function renderPag(){
       '<textarea rows="2" placeholder="📝 Observações…  (ex: paga por PIX, combinado dia 10…)" '+
       'onchange="savePagObs(\''+item.key+'\',this.value)">'+esc(meta.obs||'')+'</textarea>'+
 
-```
 '</div>';
 
 // badge status
@@ -2817,7 +2802,6 @@ return '<div class="pag-card" style="background:'+cardBg+';border:'+cardBorder+'
   actionsH+
   obsH+
 '</div>';
-```
 
 }).join(’’);
 }
@@ -3067,7 +3051,6 @@ var meta=S.pagMeta&&S.pagMeta[metaKey]||{};
 var saleMonth=null,saleYear=null;
 if(meta.date){var pts=meta.date.split(’-’);saleYear=parseInt(pts[0]);saleMonth=parseInt(pts[1])-1;}
 
-```
   // count categories for sales in this month (or all if no date)
   if(saleMonth===REL_MONTH&&saleYear===REL_YEAR){
     vendas++;
@@ -3090,7 +3073,6 @@ if(meta.date){var pts=meta.date.split(’-’);saleYear=parseInt(pts[0]);saleMon
     });
   }
 });
-```
 
 });
 
@@ -3644,7 +3626,6 @@ var b64Data=await urlParaBase64(url);
 imagePart={inline_data:{mime_type:‘image/jpeg’,data:b64Data}};
 }
 
-```
 var dica=(document.getElementById('ap-ai-dica')&&document.getElementById('ap-ai-dica').value.trim())||'';
 var dicaTxt=dica?'\n\nINFORMAÇÃO EXTRA DA USUÁRIA sobre este produto/kit: "'+dica+'" — use isso para complementar o que você vê na foto e deixar a descrição bem completa.':'';
 
@@ -3721,7 +3702,6 @@ icon.textContent='✓';txt.textContent='Preenchido pela IA!';
 btn.style.background='linear-gradient(135deg,rgba(125,216,125,0.15),rgba(125,216,125,0.07))';
 btn.style.borderColor='rgba(125,216,125,0.4)';btn.style.color='#7dd87d';
 status.style.color='rgba(125,216,125,0.6)';status.textContent='Verifique e ajuste se necessário ✓';
-```
 
 }catch(err){
 icon.textContent=‘⚠’;txt.textContent=‘Erro ao analisar’;
@@ -3966,7 +3946,6 @@ var eraEstatico=PRODUCTS.some(function(x){return x.id===_epId;});
 var fotoUrl=_epFotos.length>0&&!_epFotos[0].base64only?_epFotos[0].url:’’;
 var fotosUrls=_epFotos.filter(function(f){return !f.base64only;}).map(function(f){return f.url;});
 
-```
   if(fotoUrl){
     window._fbdb.ref('produtos_custom/'+_epId).set({
       id:_epId,name:name,brand:brand,category:_epCats.join(' '),categories:_epCats.slice(),sub:sub,
@@ -3992,7 +3971,6 @@ var fotosUrls=_epFotos.filter(function(f){return !f.base64only;}).map(function(f
     }
   }
 }
-```
 
 }catch(e){}
 
@@ -4405,12 +4383,10 @@ function loteBuildForm(p){
     '<div class="lote-field"><label>Nome</label><input class="lote-input" value="'+e(p.name)+'" placeholder="Ex: Floratta Rose" oninput="loteF(\''+p.id+'\',\'name\',this.value)"></div>' +
     '<div class="lote-field"><label>Descrição</label><textarea class="lote-textarea" oninput="loteF(\''+p.id+'\',\'sub\',this.value)">'+e(p.sub)+'</textarea></div>' +
 
-```
 '<div class="lote-field"><label>Preço R$</label><input class="lote-input" type="number" step="0.01" value="'+e(p.price)+'" placeholder="89,90" oninput="loteF(\''+p.id+'\',\'price\',this.value)"></div>' +
 '<div class="lote-field"><label>Categorias</label><div class="lote-chips" id="lcats_'+p.id+'">'+catChips+'</div></div>' +
 '<div class="lote-field"><label>Abas do catálogo</label><div class="lote-chips" id="labas_'+p.id+'">'+abaChips+'</div></div>' +
 '<div class="lote-field"><label>Badge</label><input class="lote-input" value="'+e(p.badge)+'" placeholder="Novo · Oferta" oninput="loteF(\''+p.id+'\',\'badge\',this.value)"></div>';
-```
 
 }
 
@@ -4575,7 +4551,6 @@ if(r.name  && !product.name)  product.name  = r.name;
 if(r.sub)   product.sub   = r.sub;
 if(r.badge) product.badge = r.badge;
 
-```
 // Multi-categoria
 if(r.categories && Array.isArray(r.categories) && r.categories.length) {
   product.categories = r.categories;
@@ -4616,7 +4591,6 @@ if (isKitMontado && mode !== 'desc') {
 }
 product.status = 'ready';
 product.errorMsg = '';
-```
 
 } catch(e) {
 product.status = ‘error’;
@@ -4796,7 +4770,6 @@ measurementId:‘G-X5JMZRQDQS’
 });
 _fbAuth=firebase.auth(_fbApp);
 
-```
 // Detecta resultado de redirect (mobile)
 _fbAuth.getRedirectResult().then(function(result){
   if(result&&result.user) _mostrarLogin('Login realizado!');
@@ -4807,7 +4780,6 @@ _fbAuth.getRedirectResult().then(function(result){
 _fbAuth.onAuthStateChanged(_onAuthStateChanged);
 _mostrarLogin('Pronto para login.');
 setFbStatus(true,'Firebase aguardando login...');
-```
 
 }catch(e){
 setFbStatus(false,’Erro Firebase: ’+e.message);
@@ -4821,7 +4793,6 @@ if(ls){ls.classList.add(‘hide’);setTimeout(function(){ls.style.display=‘no
 function _iniciarListenersFB(db){
 setFbStatus(true,‘Firebase conectando…’);
 
-```
 // Listener: esgotados → sincroniza com localStorage
 db.ref('esgotados').on('value',function(snap){
   setFbStatus(true,'Firebase ✓ conectado');
@@ -4902,7 +4873,6 @@ db.ref('precos').on('value',function(snap){
     if(data[id]>0)S.prices[numId]=data[id];
   });
 });
-```
 
 }
 
