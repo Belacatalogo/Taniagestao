@@ -552,6 +552,29 @@ input,select{font-family:'Montserrat',sans-serif}
 <div id="tab-config" class="tab-page">
 
   <div class="cfg-section">
+    <div class="cfg-section-title">☁ Upload de Fotos (Cloudinary)</div>
+    <div class="cfg-card">
+      <div class="cfg-card-title">📷 Envio automático para a nuvem</div>
+      <div class="cfg-card-desc">
+        Configure aqui para que as fotos de produtos e clientes sejam enviadas direto para a nuvem ao escolher do celular — sem pesar no app.<br><br>
+        1. Acesse <strong style="color:#e8c97a;">cloudinary.com</strong> → Sign Up Free<br>
+        2. Copie seu <strong style="color:#e8c97a;">Cloud Name</strong> (no dashboard)<br>
+        3. Vá em Settings → Upload → Add upload preset → Unsigned → copie o nome
+      </div>
+      <div class="modal-field-lbl" style="font-size:0.44rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(240,232,220,0.35);margin-bottom:5px;">Cloud Name</div>
+      <input id="cfg-cld-cloud" class="modal-input" type="text" placeholder="Ex: dxy1abc23" style="margin-bottom:8px;">
+      <div class="modal-field-lbl" style="font-size:0.44rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(240,232,220,0.35);margin-bottom:5px;">Upload Preset (unsigned)</div>
+      <input id="cfg-cld-preset" class="modal-input" type="text" placeholder="Ex: bela_upload" style="margin-bottom:8px;">
+      <div id="cfg-cld-status" style="font-size:0.48rem;letter-spacing:0.14em;color:rgba(240,232,220,0.3);margin-bottom:8px;min-height:14px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button class="cfg-btn cfg-btn-gold" style="flex:1;margin:0;" onclick="salvarCldConfig()">💾 Salvar</button>
+        <button class="cfg-btn cfg-btn-green" style="width:auto;padding:10px 14px;margin:0;" onclick="testarCldConfig()" title="Testar">🔍 Testar</button>
+        <button class="cfg-btn cfg-btn-red" style="width:auto;padding:10px 14px;margin:0;" onclick="apagarCldConfig()" title="Apagar">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cfg-section">
     <div class="cfg-section-title">IA — Análise de Foto</div>
     <div class="cfg-card">
       <div class="cfg-card-title">🔑 Chave da API Gemini (Google)</div>
@@ -2119,6 +2142,17 @@ function salvarAbaComemorativa(){
 }
 
 function renderConfig(){
+  // cloudinary config
+  var cfg=getCldConfig();
+  var cldCloud=document.getElementById('cfg-cld-cloud');
+  var cldPreset=document.getElementById('cfg-cld-preset');
+  var cldSt=document.getElementById('cfg-cld-status');
+  if(cldCloud)cldCloud.value=cfg.cloud||'';
+  if(cldPreset)cldPreset.value=cfg.preset||'';
+  if(cldSt){
+    if(cfg.cloud&&cfg.preset){cldSt.textContent='✓ Configurado — upload automático ativo';cldSt.style.color='rgba(125,216,125,0.7)';}
+    else{cldSt.textContent='';} 
+  }
   // preços toggle
   renderConfigPrecos();
   // chave gemini
@@ -3060,17 +3094,18 @@ function renderApFotosGrid(){
 function apAdicionarFoto(){
   var url=(document.getElementById('ap-foto').value||'').trim();
   if(!url&&!_apFotoBase64){toastMsg('⚠ Cole uma URL ou escolha uma foto do celular',true);return;}
-  var entry=_apFotoBase64?{url:_apFotoBase64,base64only:true}:{url:url,base64only:false};
+  var entry=url?{url:url,base64only:false}:{url:_apFotoBase64,base64only:true};
   _apFotos.push(entry);
   document.getElementById('ap-foto').value='';
   document.getElementById('ap-foto-preview').style.display='none';
   _apFotoBase64=null;
+  _apFotoUploading=false;
   var fi=document.getElementById('ap-foto-file');if(fi)fi.value='';
   var aiBtn=document.getElementById('ap-ai-btn');
   if(aiBtn){aiBtn.style.background='';aiBtn.style.borderColor='';aiBtn.style.color='#e8c97a';}
   var aiIcon=document.getElementById('ap-ai-icon');if(aiIcon)aiIcon.textContent='✦';
   var aiTxt=document.getElementById('ap-ai-txt');if(aiTxt)aiTxt.textContent='Analisar com IA';
-  var aiStatus=document.getElementById('ap-ai-status');if(aiStatus)aiStatus.style.display='none';
+  var aiStatus=document.getElementById('ap-ai-status');if(aiStatus){aiStatus.style.display='none';aiStatus.textContent='';}
   renderApFotosGrid();
 }
 
@@ -3079,21 +3114,111 @@ function apRemoverFoto(i){
   renderApFotosGrid();
 }
 
-// ── UPLOAD DE FOTO DO CELULAR ─────────────────────────────────────────────────
+var _apFotoUploading=false;
+
+// ── CLOUDINARY CONFIG ─────────────────────────────────────────────────────────
+function getCldConfig(){
+  try{return{cloud:localStorage.getItem('bela-cld-cloud')||'',preset:localStorage.getItem('bela-cld-preset')||''};}
+  catch(e){return{cloud:'',preset:''};}
+}
+function salvarCldConfig(){
+  var cloud=(document.getElementById('cfg-cld-cloud').value||'').trim();
+  var preset=(document.getElementById('cfg-cld-preset').value||'').trim();
+  if(!cloud||!preset){toastMsg('⚠ Preencha Cloud Name e Upload Preset');return;}
+  try{localStorage.setItem('bela-cld-cloud',cloud);localStorage.setItem('bela-cld-preset',preset);}catch(e){}
+  var st=document.getElementById('cfg-cld-status');
+  if(st){st.textContent='✓ Configuração salva! Upload automático ativo.';st.style.color='rgba(125,216,125,0.7)';}
+  toastMsg('✓ Cloudinary configurado!');
+}
+function apagarCldConfig(){
+  try{localStorage.removeItem('bela-cld-cloud');localStorage.removeItem('bela-cld-preset');}catch(e){}
+  var ci=document.getElementById('cfg-cld-cloud'),pi=document.getElementById('cfg-cld-preset');
+  if(ci)ci.value='';if(pi)pi.value='';
+  var st=document.getElementById('cfg-cld-status');
+  if(st){st.textContent='Configuração apagada.';st.style.color='rgba(240,232,220,0.3)';}
+}
+async function testarCldConfig(){
+  var cfg=getCldConfig();
+  var cloud=(document.getElementById('cfg-cld-cloud').value||'').trim()||cfg.cloud;
+  var preset=(document.getElementById('cfg-cld-preset').value||'').trim()||cfg.preset;
+  var st=document.getElementById('cfg-cld-status');
+  if(!cloud||!preset){if(st){st.textContent='⚠ Preencha Cloud Name e Preset antes de testar.';st.style.color='rgba(220,100,100,0.7)';}return;}
+  if(st){st.textContent='Testando...';st.style.color='rgba(201,168,76,0.5)';}
+  try{
+    var fd=new FormData();
+    fd.append('file','data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
+    fd.append('upload_preset',preset);
+    fd.append('folder','bela_test');
+    var r=await fetch('https://api.cloudinary.com/v1_1/'+cloud+'/image/upload',{method:'POST',body:fd});
+    var d=await r.json();
+    if(d.secure_url){if(st){st.textContent='✓ Funcionando! Upload ativo.';st.style.color='rgba(125,216,125,0.7)';}}
+    else{var msg=d.error&&d.error.message||'Erro desconhecido';if(st){st.textContent='✗ '+msg;st.style.color='rgba(220,100,100,0.7)';}}
+  }catch(e){if(st){st.textContent='✗ Erro: '+e.message;st.style.color='rgba(220,100,100,0.7)';}}
+}
+
+// Redimensiona imagem → base64
+function _resizeFile(file,maxPx,quality){
+  return new Promise(function(resolve){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var img=new Image();
+      img.onload=function(){
+        var w=img.width,h=img.height;
+        if(w>maxPx||h>maxPx){if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;}}
+        var c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(c.toDataURL('image/jpeg',quality||0.85));
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── UPLOAD DE FOTO DO CELULAR — ADICIONAR ────────────────────────────────────
 function handleApFotoUpload(input){
-  var file=input.files[0];
-  if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    _apFotoBase64=e.target.result;
-    var img=document.getElementById('ap-foto-img');
-    var prev=document.getElementById('ap-foto-preview');
-    img.src=_apFotoBase64;
-    prev.style.display='flex';
+  var file=input.files[0];if(!file)return;
+  var prev=document.getElementById('ap-foto-preview');
+  var img=document.getElementById('ap-foto-img');
+  var cfg=getCldConfig();
+  var aiStatus=document.getElementById('ap-ai-status');
+  _resizeFile(file,1600,0.88).then(function(b64){
+    if(img)img.src=b64;
+    if(prev)prev.style.display='flex';
     document.getElementById('ap-foto').value='';
-    document.getElementById('ap-foto').placeholder='(foto carregada do celular)';
-  };
-  reader.readAsDataURL(file);
+    document.getElementById('ap-foto').placeholder='(aguardando upload...)';
+    _apFotoBase64=b64;
+    _apFotoUploading=false;
+    if(!cfg.cloud||!cfg.preset){
+      if(aiStatus){aiStatus.style.display='block';aiStatus.style.color='rgba(232,160,80,0.8)';aiStatus.textContent='⚠ Foto local (configure Cloudinary). Clique + Adicionar.';}
+      return;
+    }
+    _apFotoUploading=true;
+    if(aiStatus){aiStatus.style.display='block';aiStatus.style.color='rgba(201,168,76,0.5)';aiStatus.textContent='⬆ Enviando para nuvem...';}
+    var fd=new FormData();
+    fd.append('file',b64);
+    fd.append('upload_preset',cfg.preset);
+    fd.append('folder','bela_fotos');
+    fetch('https://api.cloudinary.com/v1_1/'+cfg.cloud+'/image/upload',{method:'POST',body:fd})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d.secure_url){
+          _apFotoBase64=null;_apFotoUploading=false;
+          document.getElementById('ap-foto').value=d.secure_url;
+          document.getElementById('ap-foto').placeholder='(foto na nuvem)';
+          if(img)img.src=d.secure_url;
+          if(aiStatus){aiStatus.textContent='✓ Foto na nuvem! Clique + Adicionar ou analise com IA.';aiStatus.style.color='rgba(125,216,125,0.7)';}
+        } else {
+          _apFotoUploading=false;
+          var msg=d.error&&d.error.message||'Erro desconhecido';
+          if(aiStatus){aiStatus.textContent='✗ Erro: '+msg;aiStatus.style.color='rgba(220,100,100,0.7)';}
+        }
+      })
+      .catch(function(){
+        _apFotoUploading=false;
+        if(aiStatus){aiStatus.textContent='⚠ Upload falhou — foto local pronta. Clique + Adicionar.';aiStatus.style.color='rgba(232,160,80,0.8)';}
+      });
+  });
 }
 
 // ── MÚLTIPLAS FOTOS — EDITAR PRODUTO ─────────────────────────────────────────
@@ -3116,7 +3241,7 @@ function renderEpFotosGrid(){
 function epAdicionarFoto(){
   var url=(document.getElementById('ep-foto').value||'').trim();
   if(!url&&!_epFotoBase64){toastMsg('⚠ Cole uma URL ou escolha uma foto do celular',true);return;}
-  var entry=_epFotoBase64?{url:_epFotoBase64,base64only:true}:{url:url,base64only:false};
+  var entry=url?{url:url,base64only:false}:{url:_epFotoBase64,base64only:true};
   _epFotos.push(entry);
   document.getElementById('ep-foto').value='';
   document.getElementById('ep-foto-preview').style.display='none';
@@ -3132,20 +3257,47 @@ function epRemoverFoto(i){
   document.getElementById('ep-sem-foto-aviso').style.display=_epFotos.length?'none':'block';
 }
 
+// ── UPLOAD DE FOTO DO CELULAR — EDITAR ───────────────────────────────────────
 function handleEpFotoUpload(input){
-  var file=input.files[0];
-  if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    _epFotoBase64=e.target.result;
-    var img=document.getElementById('ep-foto-img');
-    var prev=document.getElementById('ep-foto-preview');
-    img.src=_epFotoBase64;
-    prev.style.display='block';
+  var file=input.files[0];if(!file)return;
+  var prev=document.getElementById('ep-foto-preview');
+  var img=document.getElementById('ep-foto-img');
+  var cfg=getCldConfig();
+  var statusEl=document.getElementById('ep-foto-upload-status');
+  _resizeFile(file,1600,0.88).then(function(b64){
+    if(img)img.src=b64;
+    if(prev)prev.style.display='block';
     document.getElementById('ep-foto').value='';
-    document.getElementById('ep-foto').placeholder='(foto carregada do celular)';
-  };
-  reader.readAsDataURL(file);
+    document.getElementById('ep-foto').placeholder='(aguardando upload...)';
+    _epFotoBase64=b64;
+    if(!cfg.cloud||!cfg.preset){
+      document.getElementById('ep-foto').placeholder='(foto local)';
+      if(statusEl){statusEl.style.display='block';statusEl.style.color='rgba(232,160,80,0.8)';statusEl.textContent='⚠ Foto local (configure Cloudinary). Clique + Adicionar.';}
+      return;
+    }
+    if(statusEl){statusEl.style.display='block';statusEl.style.color='rgba(201,168,76,0.5)';statusEl.textContent='⬆ Enviando para nuvem...';}
+    var fd=new FormData();
+    fd.append('file',b64);
+    fd.append('upload_preset',cfg.preset);
+    fd.append('folder','bela_fotos');
+    fetch('https://api.cloudinary.com/v1_1/'+cfg.cloud+'/image/upload',{method:'POST',body:fd})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d.secure_url){
+          _epFotoBase64=null;
+          document.getElementById('ep-foto').value=d.secure_url;
+          document.getElementById('ep-foto').placeholder='(foto na nuvem)';
+          if(img)img.src=d.secure_url;
+          if(statusEl){statusEl.style.display='block';statusEl.textContent='✓ Foto na nuvem! Clique + Adicionar.';statusEl.style.color='rgba(125,216,125,0.7)';}
+        } else {
+          var msg=d.error&&d.error.message||'Erro desconhecido';
+          if(statusEl){statusEl.style.display='block';statusEl.textContent='✗ Erro: '+msg;statusEl.style.color='rgba(220,100,100,0.7)';}
+        }
+      })
+      .catch(function(){
+        if(statusEl){statusEl.style.display='block';statusEl.textContent='⚠ Upload falhou — foto local pronta. Clique + Adicionar.';statusEl.style.color='rgba(232,160,80,0.8)';}
+      });
+  });
 }
 
 // ── ANÁLISE DE FOTO COM IA (GEMINI) ──────────────────────────────────────────
