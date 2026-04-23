@@ -179,8 +179,111 @@ input,select{font-family:'Montserrat',sans-serif}
 .detail-btn-edit{flex:1;padding:12px;border-radius:6px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);color:#e8c97a;font-size:0.58rem;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer}
 .detail-btn-del{padding:12px 14px;border-radius:6px;background:rgba(200,80,80,0.1);border:1px solid rgba(200,80,80,0.22);color:rgba(220,110,110,0.7);font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer}
 
-/* ── TABS ── */
-#tab-nav{display:flex;background:rgba(6,6,6,0.97);border-bottom:1px solid rgba(201,168,76,0.18);padding:0 12px;gap:2px;position:sticky;top:0;z-index:90}
+/* ── DEV MODE GLOBAL ── */
+#dev-banner{display:none;position:sticky;top:0;z-index:200;background:repeating-linear-gradient(-45deg,#1a0d00 0px,#1a0d00 10px,#251300 10px,#251300 20px);border-bottom:2px solid #f59e0b;padding:7px 14px;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+body.dev-mode #dev-banner{display:flex;}
+body.dev-mode #tab-nav{top:42px;}
+.dev-badge{background:#f59e0b;color:#1a0d00;font-size:0.44rem;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;padding:3px 8px;border-radius:2px;animation:devPulse 2s ease-in-out infinite;flex-shrink:0;}
+@keyframes devPulse{0%,100%{opacity:1}50%{opacity:0.6}}
+.dev-banner-text{font-size:0.5rem;letter-spacing:0.1em;color:rgba(245,158,11,0.85);flex:1;}
+.dev-switch-wrap{display:flex;align-items:center;gap:7px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.dev-switch-lbl{font-size:0.46rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(240,232,220,0.4);}
+.dev-switch{width:32px;height:18px;background:rgba(245,158,11,0.35);border:1px solid rgba(245,158,11,0.5);border-radius:9px;position:relative;transition:background 0.2s,border-color 0.2s;}
+.dev-switch::after{content:'';position:absolute;top:2px;left:16px;width:12px;height:12px;border-radius:50%;background:#f59e0b;transition:left 0.2s;}
+body:not(.dev-mode) .dev-switch{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);}
+body:not(.dev-mode) .dev-switch::after{left:2px;background:rgba(255,255,255,0.3);}
+
+/* ── CADASTRO EM LOTE ── */
+.lote-section{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.18);border-radius:6px;margin-bottom:10px;overflow:hidden;}
+.lote-section-header{display:flex;align-items:center;gap:8px;padding:12px 14px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;}
+.lote-section-icon{font-size:1rem;flex-shrink:0;}
+.lote-section-title{font-size:0.54rem;font-weight:600;letter-spacing:0.26em;text-transform:uppercase;color:#C9A84C;flex:1;}
+.lote-section-arrow{font-size:0.65rem;color:rgba(201,168,76,0.5);transition:transform 0.25s;}
+.lote-section.open .lote-section-arrow{transform:rotate(180deg);}
+.lote-section-body{display:none;padding:0 14px 14px;}
+.lote-section.open .lote-section-body{display:block;}
+.lote-steps{display:flex;gap:0;margin-bottom:14px;position:relative;}
+.lote-steps::before{content:'';position:absolute;top:14px;left:14px;right:14px;height:1px;background:rgba(255,255,255,0.07);z-index:0;}
+.lote-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;z-index:1;}
+.lote-step-num{width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);background:#0d0d0d;display:flex;align-items:center;justify-content:center;font-size:0.5rem;font-weight:600;color:rgba(240,232,220,0.3);transition:all 0.3s;}
+.lote-step.active .lote-step-num{border-color:#C9A84C;background:#C9A84C;color:#080808;}
+.lote-step.done .lote-step-num{border-color:#7dd87d;background:#7dd87d;color:#fff;}
+.lote-step-lbl{font-size:0.4rem;letter-spacing:0.16em;text-transform:uppercase;color:rgba(240,232,220,0.25);text-align:center;}
+.lote-step.active .lote-step-lbl{color:#C9A84C;}
+.lote-step.done .lote-step-lbl{color:#7dd87d;}
+.lote-panel{display:none;}
+.lote-panel.active{display:block;animation:loteIn 0.25s ease;}
+@keyframes loteIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.lote-drop{border:1px dashed rgba(201,168,76,0.3);border-radius:6px;padding:24px 14px;text-align:center;cursor:pointer;transition:all 0.25s;background:rgba(201,168,76,0.02);}
+.lote-drop:hover,.lote-drop.dragover{border-color:#C9A84C;background:rgba(201,168,76,0.06);}
+.lote-drop input{display:none;}
+.lote-drop-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:300;color:#f0e8dc;margin-bottom:4px;}
+.lote-drop-sub{font-size:0.46rem;letter-spacing:0.16em;color:rgba(240,232,220,0.28);margin-bottom:12px;}
+.lote-cfg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.lote-cfg-lbl{font-size:0.42rem;letter-spacing:0.24em;text-transform:uppercase;color:rgba(240,232,220,0.35);display:block;margin-bottom:4px;}
+.lote-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;font-family:'Montserrat',sans-serif;font-size:0.5rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;border:none;border-radius:4px;transition:all 0.2s;}
+.lote-btn-gold{background:#C9A84C;color:#080808;}
+.lote-btn-gold:hover{background:#e8c97a;}
+.lote-btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(240,232,220,0.4);}
+.lote-btn-ghost:hover{border-color:rgba(255,255,255,0.22);color:#f0e8dc;}
+.lote-btn-green{background:#25D366;color:#fff;}
+.lote-btn-dev{background:#f59e0b;color:#1a0d00;}
+.lote-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:4px;margin-bottom:10px;}
+.lote-toolbar-info{font-size:0.46rem;letter-spacing:0.16em;color:rgba(240,232,220,0.38);}
+.lote-toolbar-info strong{color:#C9A84C;font-weight:600;}
+.lote-toolbar-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.lote-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.lote-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:5px;overflow:hidden;transition:border-color 0.25s;}
+.lote-card.ready{border-color:rgba(125,216,125,0.25);}
+.lote-card.processing{border-color:rgba(201,168,76,0.3);}
+.lote-card.error{border-color:rgba(200,80,80,0.3);}
+.lote-card.excluded{opacity:0.32;border-color:rgba(255,255,255,0.05);}
+.lote-card-img{position:relative;aspect-ratio:3/4;overflow:hidden;background:#0a0a0a;}
+.lote-card-img img{width:100%;height:100%;object-fit:cover;object-position:center;}
+.lote-card-badge{position:absolute;top:5px;left:5px;font-size:0.38rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;padding:2px 6px;backdrop-filter:blur(6px);}
+.badge-processing{background:rgba(201,168,76,0.85);color:#080808;}
+.badge-ready{background:rgba(125,216,125,0.85);color:#fff;}
+.badge-error{background:rgba(200,80,80,0.85);color:#fff;}
+.badge-excluded{background:rgba(255,255,255,0.14);color:rgba(255,255,255,0.45);}
+.lote-card-excl{position:absolute;top:5px;right:5px;width:20px;height:20px;background:rgba(0,0,0,0.65);border:1px solid rgba(200,80,80,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(220,110,110,0.8);font-size:0.55rem;transition:all 0.2s;}
+.lote-card.excluded .lote-card-excl{border-color:rgba(125,216,125,0.4);color:#7dd87d;}
+.lote-card-body{padding:7px 9px;}
+.lote-field{margin-bottom:6px;}
+.lote-field label{font-size:0.38rem;letter-spacing:0.26em;text-transform:uppercase;color:rgba(201,168,76,0.5);display:block;margin-bottom:3px;}
+.lote-input,.lote-select,.lote-textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.13);color:#f0e8dc;font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:300;padding:5px 7px;border-radius:3px;outline:none;transition:border-color 0.2s;}
+.lote-input:focus,.lote-select:focus,.lote-textarea:focus{border-color:rgba(201,168,76,0.4);}
+.lote-textarea{resize:vertical;min-height:40px;line-height:1.4;}
+.lote-select option{background:#111;}
+.lote-2col{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.lote-confirm-box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:5px;padding:12px 14px;margin-bottom:10px;}
+.lote-confirm-stats{display:flex;gap:18px;margin-bottom:10px;flex-wrap:wrap;}
+.lote-stat-num{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;color:#C9A84C;line-height:1;}
+.lote-stat-lbl{font-size:0.4rem;letter-spacing:0.22em;text-transform:uppercase;color:rgba(240,232,220,0.26);margin-top:2px;}
+.lote-confirm-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:5px;margin-bottom:8px;}
+.lote-confirm-item{display:flex;gap:6px;align-items:center;padding:6px 7px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);border-radius:3px;}
+.lote-confirm-item img{width:24px;height:32px;object-fit:cover;flex-shrink:0;border-radius:2px;}
+.lote-confirm-name{font-family:'Cormorant Garamond',serif;font-size:0.7rem;color:#f0e8dc;line-height:1.15;}
+.lote-confirm-price{font-size:0.4rem;color:#C9A84C;margin-top:1px;}
+.lote-progress-wrap{margin:10px 0 0;}
+.lote-progress-row{display:flex;justify-content:space-between;margin-bottom:4px;}
+.lote-progress-lbl{font-size:0.42rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(201,168,76,0.5);}
+.lote-progress-pct{font-size:0.42rem;color:#C9A84C;}
+.lote-progress-bg{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
+.lote-progress-fill{height:100%;background:linear-gradient(to right,#C9A84C,#e8c97a);transition:width 0.4s ease;border-radius:2px;}
+.lote-dev-warn{display:none;padding:8px 10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:4px;font-size:0.48rem;letter-spacing:0.1em;color:#f59e0b;margin-bottom:8px;}
+body.dev-mode .lote-dev-warn{display:block;}
+.lote-success{text-align:center;padding:24px 10px;}
+.lote-success-icon{width:46px;height:46px;border-radius:50%;background:rgba(125,216,125,0.1);border:1px solid rgba(125,216,125,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:#7dd87d;font-size:1.1rem;}
+.lote-success-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:#f0e8dc;margin-bottom:4px;}
+.lote-success-sub{font-size:0.5rem;letter-spacing:0.14em;color:rgba(240,232,220,0.32);margin-bottom:16px;}
+.dev-log-box{background:#060606;border:1px solid rgba(245,158,11,0.2);border-radius:4px;padding:9px 11px;margin-top:10px;max-height:180px;overflow-y:auto;font-family:'Courier New',monospace;display:none;}
+body.dev-mode .dev-log-box{display:block;}
+.dev-log-header{font-size:0.42rem;letter-spacing:0.26em;text-transform:uppercase;color:#f59e0b;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;}
+.dev-log-entry{font-size:0.54rem;line-height:1.5;border-bottom:1px solid rgba(255,255,255,0.04);padding:2px 0;}
+.dev-log-entry.ok{color:#7dd87d;}.dev-log-entry.warn{color:#f59e0b;}.dev-log-entry.info{color:#60a5fa;}.dev-log-entry.block{color:#f87171;}
+.dev-log-ts{color:rgba(255,255,255,0.2);margin-right:5px;font-size:0.46rem;}
+.ai-bar{height:2px;background:linear-gradient(to right,transparent,#C9A84C,transparent);animation:aiBarAnim 1.1s ease-in-out infinite;margin-bottom:5px;}
+@keyframes aiBarAnim{0%{transform:scaleX(0.1) translateX(-200%)}50%{transform:scaleX(0.5) translateX(50%)}100%{transform:scaleX(0.1) translateX(400%)}}
 .tab-btn{padding:12px 14px 10px;font-size:0.52rem;letter-spacing:0.28em;text-transform:uppercase;font-weight:400;background:transparent;color:rgba(240,232,220,0.3);border-bottom:2px solid transparent;border-radius:0;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
 .tab-btn.active{color:#C9A84C;border-bottom-color:#C9A84C;font-weight:600}
 .tab-page{display:none}
@@ -393,6 +496,15 @@ input,select{font-family:'Montserrat',sans-serif}
 </head>
 <body>
 
+<div id="dev-banner">
+  <div class="dev-badge">⚠ DEV MODE</div>
+  <div class="dev-banner-text">Modo de desenvolvimento ativo — <strong>Firebase bloqueado em todo o painel</strong> · Cloudinary funciona normalmente</div>
+  <div class="dev-switch-wrap" onclick="toggleDevMode()">
+    <span class="dev-switch-lbl">Desativar</span>
+    <div class="dev-switch"></div>
+  </div>
+</div>
+
 <div id="toast">✓ Salvo</div>
 
 <!-- ── TELA DE LOGIN ── -->
@@ -513,6 +625,145 @@ input,select{font-family:'Montserrat',sans-serif}
 
 <!-- ═══ ABA PRODUTOS ═══ -->
 <div id="tab-produtos" class="tab-page">
+
+  <!-- ── MODO DEV ── -->
+  <div class="cfg-section">
+    <div class="cfg-section-title">🛡 Modo Desenvolvimento</div>
+    <div class="cfg-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <div style="flex:1;">
+          <div class="cfg-card-title" id="dev-mode-title">Modo Dev: <span style="color:rgba(240,232,220,0.3);">Desativado</span></div>
+          <div class="cfg-card-desc" style="margin-top:4px;">Ative para testar qualquer operação do painel sem risco. Apenas o <strong style="color:#f59e0b;">Firebase fica bloqueado</strong> — gravações, atualizações e sincronizações não são enviadas. O Cloudinary continua funcionando normalmente, assim como salvamentos locais e análise de IA.</div>
+        </div>
+        <div class="dev-switch-wrap" onclick="toggleDevMode()" style="flex-shrink:0;">
+          <div class="dev-switch" id="dev-switch-prod"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CADASTRO EM LOTE ── -->
+  <div class="cfg-section">
+    <div class="cfg-section-title">📦 Cadastro em Lote</div>
+    <div class="lote-section open" id="lote-accordion">
+      <div class="lote-section-header" onclick="toggleLoteAccordion()">
+        <span class="lote-section-icon">🚀</span>
+        <span class="lote-section-title">Adicionar produtos em lote com IA</span>
+        <span class="lote-section-arrow">▾</span>
+      </div>
+      <div class="lote-section-body">
+
+        <div class="lote-steps">
+          <div class="lote-step active" id="lStep1"><div class="lote-step-num">1</div><div class="lote-step-lbl">Upload</div></div>
+          <div class="lote-step" id="lStep2"><div class="lote-step-num">2</div><div class="lote-step-lbl">Revisar</div></div>
+          <div class="lote-step" id="lStep3"><div class="lote-step-num">3</div><div class="lote-step-lbl">Confirmar</div></div>
+          <div class="lote-step" id="lStep4"><div class="lote-step-num">✓</div><div class="lote-step-lbl">Publicado</div></div>
+        </div>
+
+        <!-- STEP 1: UPLOAD -->
+        <div class="lote-panel active" id="lotePanelUpload">
+          <div class="lote-cfg">
+            <div class="lote-field">
+              <label class="lote-cfg-lbl">Aba do catálogo</label>
+              <select class="lote-select" id="loteDefaultSection">
+                <option value="todos">✦ Todos</option>
+                <option value="colecao">⭐ Coleção</option>
+                <option value="maes">🌷 Dia das Mães</option>
+                <option value="beleza">💄 Beleza & Kids</option>
+              </select>
+            </div>
+            <div class="lote-field">
+              <label class="lote-cfg-lbl">Categoria padrão</label>
+              <select class="lote-select" id="loteDefaultCategory">
+                <option value="feminino">Feminino</option>
+                <option value="masculino">Masculino</option>
+                <option value="kit">Kit</option>
+                <option value="hidratante">Hidratante</option>
+                <option value="kids">Kids</option>
+              </select>
+            </div>
+            <div class="lote-field">
+              <label class="lote-cfg-lbl">Análise por IA (Gemini)</label>
+              <select class="lote-select" id="loteAiMode">
+                <option value="full">Completa (nome + desc + aba)</option>
+                <option value="desc">Só descrição</option>
+                <option value="off">Desativada</option>
+              </select>
+            </div>
+          </div>
+          <div class="lote-drop" id="loteDropZone" onclick="document.getElementById('loteFileInput').click()">
+            <input type="file" id="loteFileInput" multiple accept="image/*">
+            <div style="font-size:1.4rem;margin-bottom:6px;">📷</div>
+            <div class="lote-drop-title">Arraste as fotos aqui</div>
+            <div class="lote-drop-sub">ou toque para selecionar · JPG, PNG, WEBP · até 20 fotos</div>
+            <button class="lote-btn lote-btn-gold" onclick="event.stopPropagation();document.getElementById('loteFileInput').click()">Selecionar fotos</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: REVIEW -->
+        <div class="lote-panel" id="lotePanelReview">
+          <div class="lote-toolbar">
+            <div class="lote-toolbar-info">
+              <strong id="loteReviewCount">0</strong> fotos ·
+              <span style="color:#7dd87d;" id="loteReviewReady">0 prontas</span> ·
+              <span id="loteReviewExcluded">0 excluídas</span>
+            </div>
+            <div class="lote-toolbar-actions">
+              <button class="lote-btn lote-btn-ghost" onclick="loteGoStep(1)">← Voltar</button>
+              <button class="lote-btn lote-btn-ghost" onclick="loteReanalyzeAll()">↻ Re-analisar</button>
+              <button class="lote-btn lote-btn-gold" onclick="loteGoStep(3)">Confirmar →</button>
+            </div>
+          </div>
+          <div class="lote-grid" id="lotePreviewGrid"></div>
+        </div>
+
+        <!-- STEP 3: CONFIRM -->
+        <div class="lote-panel" id="lotePanelConfirm">
+          <div class="lote-confirm-box">
+            <div class="lote-confirm-stats">
+              <div><div class="lote-stat-num" id="loteConfirmTotal">0</div><div class="lote-stat-lbl">Para publicar</div></div>
+              <div><div class="lote-stat-num" id="loteConfirmExcluded" style="color:rgba(240,232,220,0.22);">0</div><div class="lote-stat-lbl">Excluídos</div></div>
+            </div>
+            <div class="lote-confirm-list" id="loteConfirmList"></div>
+          </div>
+          <div class="lote-dev-warn">⚠ MODO DEV ATIVO — Firebase bloqueado. As fotos serão enviadas ao Cloudinary normalmente, mas nada será salvo no banco de dados.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+            <button class="lote-btn lote-btn-ghost" onclick="loteGoStep(2)">← Revisar</button>
+            <button class="lote-btn lote-btn-green" id="loteBtnPublish" onclick="lotePublishAll()">✓ Publicar no Catálogo</button>
+          </div>
+          <div id="lotePublishProgress" style="display:none;">
+            <div class="lote-progress-wrap">
+              <div class="lote-progress-row"><span class="lote-progress-lbl" id="loteProgressLabel">Enviando...</span><span class="lote-progress-pct" id="loteProgressPct">0%</span></div>
+              <div class="lote-progress-bg"><div class="lote-progress-fill" id="loteProgressFill" style="width:0%"></div></div>
+            </div>
+          </div>
+          <div class="dev-log-box" id="loteDevLog">
+            <div class="dev-log-header">
+              <span>🔍 Simulação — o que seria enviado</span>
+              <button onclick="loteExportJson()" style="background:transparent;border:1px solid rgba(245,158,11,0.3);color:#f59e0b;font-size:0.4rem;padding:2px 7px;border-radius:3px;cursor:pointer;letter-spacing:0.12em;text-transform:uppercase;">⬇ JSON</button>
+            </div>
+            <div id="loteDevLogEntries"></div>
+          </div>
+        </div>
+
+        <!-- STEP 4: SUCCESS -->
+        <div class="lote-panel" id="lotePanelSuccess">
+          <div class="lote-success">
+            <div class="lote-success-icon">✓</div>
+            <div class="lote-success-title" id="loteSuccessTitle">Publicado!</div>
+            <div class="lote-success-sub" id="loteSuccessMsg">0 produtos adicionados.</div>
+            <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+              <button class="lote-btn lote-btn-ghost" onclick="loteReset()">+ Novo lote</button>
+              <button class="lote-btn lote-btn-gold" onclick="renderProdTab()">Ver produtos ↓</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── GERENCIAR (original) ── -->
   <div class="cfg-section">
     <div class="cfg-section-title">Gerenciar Produtos</div>
     <div class="cfg-card">
@@ -3922,6 +4173,388 @@ function _onAuthStateChanged(user){
     _iniciarListenersFB(db);
   }
   _atualizarStatusBackup();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── MODO DEV GLOBAL ──────────────────────────────────────────────────────────
+// Intercepta Firebase e Cloudinary em TODO o painel quando ativo.
+// O localStorage continua funcionando normalmente.
+
+var _devMode = false;
+
+function toggleDevMode() {
+  _devMode = !_devMode;
+  document.body.classList.toggle('dev-mode', _devMode);
+  var banner = document.getElementById('dev-banner');
+  if (banner) banner.classList.toggle('show', _devMode); // show via CSS body.dev-mode
+  var title = document.getElementById('dev-mode-title');
+  if (title) title.innerHTML = 'Modo Dev: <span style="color:' + (_devMode ? '#f59e0b' : 'rgba(240,232,220,0.3)') + ';">' + (_devMode ? 'Ativo ⚠' : 'Desativado') + '</span>';
+  var btn = document.getElementById('loteBtnPublish');
+  if (btn) {
+    btn.className = 'lote-btn ' + (_devMode ? 'lote-btn-dev' : 'lote-btn-green');
+    btn.textContent = _devMode ? '⚙ Simular Publicação' : '✓ Publicar no Catálogo';
+  }
+  toastMsg(_devMode ? '⚠ Modo Dev ativo — Firebase bloqueado' : '✓ Modo Dev desativado');
+}
+
+// Wrapper seguro para db.ref().set() — bloqueado em dev mode
+// O Cloudinary NÃO é bloqueado, apenas gravações no Firebase.
+function _dbSet(path, value, cb) {
+  if (_devMode) {
+    console.log('[DEV] Firebase bloqueado — set:', path, value);
+    if (cb) cb(null);
+    return;
+  }
+  if (!window._fbdb) { if (cb) cb(new Error('sem Firebase')); return; }
+  window._fbdb.ref(path).set(value, cb || function(){});
+}
+
+// Wrapper para fetch Cloudinary
+async function _cloudinaryUpload(cloud, preset, file, folder) {
+  // Cloudinary sempre funciona, mesmo em dev mode — só o Firebase é bloqueado
+  var fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', preset);
+  if (folder) fd.append('folder', folder);
+  var res = await fetch('https://api.cloudinary.com/v1_1/' + cloud + '/image/upload', { method: 'POST', body: fd });
+  var data = await res.json();
+  if (!data.secure_url) throw new Error('Cloudinary: ' + ((data.error && data.error.message) || 'erro'));
+  return data;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── CADASTRO EM LOTE ─────────────────────────────────────────────────────────
+var _loteProducts = [];
+
+var LOTE_ABAS = {
+  todos:   '✦ Todos',
+  colecao: '⭐ Coleção',
+  maes:    '🌷 Dia das Mães',
+  beleza:  '💄 Beleza & Kids'
+};
+var LOTE_CATS = {
+  feminino:'Feminino', masculino:'Masculino', kit:'Kit',
+  hidratante:'Hidratante', kids:'Kids'
+};
+
+function toggleLoteAccordion() {
+  document.getElementById('lote-accordion').classList.toggle('open');
+}
+
+function loteGoStep(n) {
+  ['lotePanelUpload','lotePanelReview','lotePanelConfirm','lotePanelSuccess'].forEach(function(id,i) {
+    var el = document.getElementById(id); if (el) el.classList.toggle('active', i+1===n);
+  });
+  ['lStep1','lStep2','lStep3','lStep4'].forEach(function(id,i) {
+    var el = document.getElementById(id); if (!el) return;
+    el.classList.remove('active','done');
+    if (i+1 < n) el.classList.add('done');
+    if (i+1 === n) el.classList.add('active');
+  });
+  if (n === 3) loteBuildConfirm();
+}
+
+// ── File drop / input ──
+(function(){
+  function init(){
+    var drop = document.getElementById('loteDropZone');
+    var inp  = document.getElementById('loteFileInput');
+    if (!drop || !inp) return;
+    drop.addEventListener('dragover',  function(e){ e.preventDefault(); drop.classList.add('dragover'); });
+    drop.addEventListener('dragleave', function(){ drop.classList.remove('dragover'); });
+    drop.addEventListener('drop',      function(e){ e.preventDefault(); drop.classList.remove('dragover'); loteHandleFiles(Array.from(e.dataTransfer.files)); });
+    inp.addEventListener('change',     function(){ loteHandleFiles(Array.from(this.files)); this.value=''; });
+  }
+  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+function loteHandleFiles(files) {
+  var imgs = files.filter(function(f){ return f.type.startsWith('image/'); });
+  if (!imgs.length) { toastMsg('Nenhuma imagem válida'); return; }
+  if (imgs.length > 20) { toastMsg('Máx 20 imagens'); imgs = imgs.slice(0,20); }
+  var sec = (document.getElementById('loteDefaultSection')||{}).value || 'todos';
+  var cat = (document.getElementById('loteDefaultCategory')||{}).value || 'feminino';
+  imgs.forEach(function(file){
+    _loteProducts.push({
+      id: 'lp_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+      file: file, previewUrl: URL.createObjectURL(file),
+      status: 'processing',
+      brand:'', name:'', sub:'', volume:'', price:'', badge:'',
+      section: sec, category: cat, cloudinaryUrl: null
+    });
+  });
+  loteGoStep(2);
+  loteRenderGrid();
+  loteAnalyzeAll();
+}
+
+// ── Grid / Cards ──
+function loteRenderGrid(){
+  var grid = document.getElementById('lotePreviewGrid'); if (!grid) return;
+  grid.innerHTML = '';
+  _loteProducts.forEach(function(p){ grid.appendChild(loteBuildCard(p)); });
+  loteUpdateToolbar();
+}
+
+function loteBuildCard(p){
+  var card = document.createElement('div');
+  card.className = 'lote-card '+p.status;
+  card.id = 'lcard_'+p.id;
+  var sLbl = {processing:'Analisando',ready:'Pronto',error:'Erro',excluded:'Excluído'};
+  var sCls = {processing:'badge-processing',ready:'badge-ready',error:'badge-error',excluded:'badge-excluded'};
+  var e = function(v){ return (v||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); };
+  card.innerHTML =
+    '<div class="lote-card-img">' +
+      '<img src="'+p.previewUrl+'" alt="">' +
+      '<div class="lote-card-badge '+sCls[p.status]+'" id="lbadge_'+p.id+'">'+sLbl[p.status]+'</div>' +
+      '<div class="lote-card-excl" onclick="loteToggleExclude(\''+p.id+'\')">'+(p.status==='excluded'?'↩':'✕')+'</div>' +
+    '</div>' +
+    '<div class="lote-card-body" id="lcbody_'+p.id+'">' +
+      (p.status==='processing' ? '<div class="ai-bar"></div><div class="shimmer" style="height:9px;width:55%;margin-bottom:5px;border-radius:3px;background:linear-gradient(90deg,rgba(201,168,76,0.07) 25%,rgba(201,168,76,0.16) 50%,rgba(201,168,76,0.07) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;"></div><div class="shimmer" style="height:9px;width:85%;border-radius:3px;background:linear-gradient(90deg,rgba(201,168,76,0.07) 25%,rgba(201,168,76,0.16) 50%,rgba(201,168,76,0.07) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;"></div>' : loteBuildForm(p)) +
+    '</div>';
+  return card;
+}
+
+function loteBuildForm(p){
+  var e = function(v){ return (v||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); };
+  var catOpts = Object.keys(LOTE_CATS).map(function(k){ return '<option value="'+k+'"'+(p.category===k?' selected':'')+'>'+LOTE_CATS[k]+'</option>'; }).join('');
+  var secOpts = Object.keys(LOTE_ABAS).map(function(k){ return '<option value="'+k+'"'+(p.section===k?' selected':'')+'>'+LOTE_ABAS[k]+'</option>'; }).join('');
+  return '<div class="lote-field"><label>Marca</label><input class="lote-input" value="'+e(p.brand)+'" placeholder="Ex: O Boticário" oninput="loteF(\''+p.id+'\',\'brand\',this.value)"></div>' +
+    '<div class="lote-field"><label>Nome</label><input class="lote-input" value="'+e(p.name)+'" placeholder="Ex: Floratta Rose" oninput="loteF(\''+p.id+'\',\'name\',this.value)"></div>' +
+    '<div class="lote-field"><label>Descrição</label><textarea class="lote-textarea" oninput="loteF(\''+p.id+'\',\'sub\',this.value)">'+e(p.sub)+'</textarea></div>' +
+    '<div class="lote-2col">' +
+      '<div class="lote-field"><label>Preço R$</label><input class="lote-input" type="number" step="0.01" value="'+e(p.price)+'" placeholder="89,90" oninput="loteF(\''+p.id+'\',\'price\',this.value)"></div>' +
+      '<div class="lote-field"><label>Volume</label><input class="lote-input" value="'+e(p.volume)+'" placeholder="75ml" oninput="loteF(\''+p.id+'\',\'volume\',this.value)"></div>' +
+    '</div>' +
+    '<div class="lote-2col">' +
+      '<div class="lote-field"><label>Categoria</label><select class="lote-select" onchange="loteF(\''+p.id+'\',\'category\',this.value)">'+catOpts+'</select></div>' +
+      '<div class="lote-field"><label>Aba catálogo</label><select class="lote-select" onchange="loteF(\''+p.id+'\',\'section\',this.value)">'+secOpts+'</select></div>' +
+    '</div>' +
+    '<div class="lote-field"><label>Badge</label><input class="lote-input" value="'+e(p.badge)+'" placeholder="Novo · Oferta" oninput="loteF(\''+p.id+'\',\'badge\',this.value)"></div>';
+}
+
+function loteF(id, field, val){ var p=_loteProducts.find(function(x){return x.id===id;}); if(p) p[field]=val; }
+
+function loteToggleExclude(id){
+  var p = _loteProducts.find(function(x){return x.id===id;}); if(!p) return;
+  p.status = p.status==='excluded' ? 'ready' : 'excluded';
+  loteRefreshCard(id); loteUpdateToolbar();
+}
+
+function loteRefreshCard(id){
+  var p = _loteProducts.find(function(x){return x.id===id;}); if(!p) return;
+  var card = document.getElementById('lcard_'+id); if(!card) return;
+  card.parentNode.replaceChild(loteBuildCard(p), card);
+}
+
+function loteUpdateToolbar(){
+  var t=_loteProducts.length, r=_loteProducts.filter(function(p){return p.status==='ready';}).length, ex=_loteProducts.filter(function(p){return p.status==='excluded';}).length;
+  var rc=document.getElementById('loteReviewCount'); if(rc) rc.textContent=t;
+  var rr=document.getElementById('loteReviewReady'); if(rr) rr.textContent=r+' prontas';
+  var re=document.getElementById('loteReviewExcluded'); if(re) re.textContent=ex+' excluídas';
+}
+
+// ── AI (usa Gemini já configurado) ──
+async function loteAnalyzeAll(){
+  var mode = (document.getElementById('loteAiMode')||{}).value || 'full';
+  if (mode==='off'){
+    _loteProducts.forEach(function(p){ if(p.status==='processing'){p.status='ready'; loteRefreshCard(p.id);} });
+    loteUpdateToolbar(); return;
+  }
+  var pending = _loteProducts.filter(function(p){ return p.status==='processing'; });
+  for (var i=0; i<pending.length; i+=3) {
+    await Promise.all(pending.slice(i,i+3).map(function(p){ return loteAnalyzeOne(p, mode); }));
+  }
+}
+
+async function loteAnalyzeOne(product, mode){
+  try {
+    var GEMINI_KEY = localStorage.getItem('bela-gemini-key') || '';
+    if (!GEMINI_KEY){ product.status='error'; loteRefreshCard(product.id); loteUpdateToolbar(); return; }
+    var b64 = await loteFileToB64(product.file);
+    var mt  = product.file.type || 'image/jpeg';
+    var prompt = mode==='desc'
+      ? 'Foto de produto de perfumaria/beleza. Responda APENAS com JSON puro sem markdown: {"sub":"descrição elegante em português, máx 12 palavras"}'
+      : 'Foto de produto de perfumaria ou beleza. Responda APENAS com JSON puro sem markdown: {"brand":"marca","name":"nome do produto","sub":"descrição elegante em português máx 12 palavras","volume":"se visível ex 75ml","badge":"Novo ou Oferta ou vazio","category":"feminino|masculino|kit|hidratante|kids","section":"todos|colecao|maes|beleza"}';
+    var modelo = localStorage.getItem('bela-gemini-modelo') || 'gemini-2.5-flash';
+    var resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+modelo+':generateContent?key='+GEMINI_KEY, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ contents:[{parts:[{inline_data:{mime_type:mt,data:b64}},{text:prompt}]}], generationConfig:{temperature:0.1,maxOutputTokens:512} })
+    });
+    var data = await resp.json();
+    var raw = '';
+    try{ raw=data.candidates[0].content.parts[0].text; }catch(e){}
+    raw = raw.replace(/```json|```/g,'').trim();
+    var s=raw.indexOf('{'), en=raw.lastIndexOf('}');
+    if(s>=0&&en>s) raw=raw.substring(s,en+1);
+    var r = JSON.parse(raw);
+    if(r.brand && !product.brand) product.brand = r.brand;
+    if(r.name  && !product.name)  product.name  = r.name;
+    if(r.sub)   product.sub   = r.sub;
+    if(r.volume && !product.volume) product.volume = r.volume;
+    if(r.badge) product.badge = r.badge;
+    if(r.category) product.category = r.category;
+    if(r.section)  product.section  = r.section;
+    product.status = 'ready';
+  } catch(e) {
+    product.status = 'error';
+  }
+  loteRefreshCard(product.id);
+  loteUpdateToolbar();
+}
+
+async function loteReanalyzeAll(){
+  _loteProducts.forEach(function(p){ if(p.status!=='excluded'){ p.status='processing'; loteRefreshCard(p.id); } });
+  loteUpdateToolbar();
+  await loteAnalyzeAll();
+  toastMsg('Re-análise concluída');
+}
+
+function loteFileToB64(file){
+  return new Promise(function(resolve,reject){
+    var r=new FileReader();
+    r.onload=function(){ resolve(r.result.split(',')[1]); };
+    r.onerror=reject;
+    r.readAsDataURL(file);
+  });
+}
+
+// ── Confirm ──
+function loteBuildConfirm(){
+  var active  = _loteProducts.filter(function(p){ return p.status!=='excluded'; });
+  var excluidos = _loteProducts.filter(function(p){ return p.status==='excluded'; });
+  var ct=document.getElementById('loteConfirmTotal');    if(ct) ct.textContent=active.length;
+  var ce=document.getElementById('loteConfirmExcluded'); if(ce) ce.textContent=excluidos.length;
+  var list=document.getElementById('loteConfirmList');
+  if(list){
+    list.innerHTML='';
+    active.forEach(function(p){
+      var item=document.createElement('div'); item.className='lote-confirm-item';
+      item.innerHTML='<img src="'+p.previewUrl+'" alt=""><div>'+
+        '<div class="lote-confirm-name">'+(p.name||'Sem nome')+'</div>'+
+        '<div style="font-size:0.38rem;color:rgba(240,232,220,0.28);">'+(p.brand||'')+'</div>'+
+        '<div class="lote-confirm-price">'+(p.price?'R$ '+parseFloat(p.price).toFixed(2).replace('.',','):'—')+'</div>'+
+      '</div>';
+      list.appendChild(item);
+    });
+  }
+  // botão muda se dev mode ativo
+  var btn=document.getElementById('loteBtnPublish');
+  if(btn){
+    btn.className='lote-btn '+(_devMode?'lote-btn-dev':'lote-btn-green');
+    btn.textContent=_devMode?'⚙ Simular Publicação':'✓ Publicar no Catálogo';
+  }
+  if(_devMode) loteRunDevPreview(active);
+}
+
+function loteRunDevPreview(active){
+  var entries=document.getElementById('loteDevLogEntries'); if(!entries) return;
+  var cld=_loteGetCld();
+  var ts=(function(){ var n=new Date(); return ('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2)+':'+('0'+n.getSeconds()).slice(-2); })();
+  var lines=[{cls:'info',txt:'— '+active.length+' produto(s) · Cloudinary: real | Firebase: bloqueado —'}];
+  active.forEach(function(p,i){
+    lines.push({cls:'ok',  txt:'['+( i+1)+'] Cloudinary ✓ → cloud: '+(cld.cloud||'não configurado')+' | pasta: tania-parfum'});
+    lines.push({cls:'block',txt:'    Firebase ⛔ bloqueado → produtos_estaticos/'+(Date.now()+i)+' NÃO gravado'});
+    lines.push({cls:'warn', txt:'    Payload: {name:"'+(p.name||'?')+'", brand:"'+(p.brand||'?')+'", price:'+(p.price||'null')+', section:"'+p.section+'"}'});
+  });
+  lines.push({cls:'block',txt:'⛔ MODO DEV: '+active.length+' gravação(ões) Firebase suprimida(s).'});
+  entries.innerHTML=lines.map(function(l){
+    return '<div class="dev-log-entry '+l.cls+'"><span class="dev-log-ts">'+ts+'</span>'+l.txt+'</div>';
+  }).join('');
+}
+
+function loteExportJson(){
+  var active=_loteProducts.filter(function(p){return p.status!=='excluded';});
+  var blob=new Blob([JSON.stringify(active.map(function(p){
+    return {name:p.name,brand:p.brand,sub:p.sub,volume:p.volume,price:p.price?parseFloat(p.price):null,badge:p.badge,section:p.section,category:p.category,file:p.file.name};
+  }),null,2)],{type:'application/json'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='lote-dev-'+Date.now()+'.json'; a.click();
+}
+
+function _loteGetCld(){
+  try{ return {cloud:localStorage.getItem('bela-cld-cloud')||'',preset:localStorage.getItem('bela-cld-preset')||''}; }catch(e){ return {}; }
+}
+
+// ── Publish ──
+async function lotePublishAll(){
+  var active=_loteProducts.filter(function(p){return p.status!=='excluded';});
+  if(!active.length){ toastMsg('Nenhum produto para publicar'); return; }
+
+  var btn=document.getElementById('loteBtnPublish'); if(btn) btn.disabled=true;
+  document.getElementById('lotePublishProgress').style.display='block';
+
+  if(_devMode){
+    // Dev mode: Cloudinary upload real, Firebase bloqueado
+    var done=0, errors=0;
+    for(var i=0;i<active.length;i++){
+      var p=active[i];
+      loteSetProgress(i,active.length,'📷 Enviando foto ao Cloudinary: '+(p.name||'produto')+'...');
+      try{
+        var cdnData=await _cloudinaryUpload(cld.cloud,cld.preset,p.file,'tania-parfum');
+        p.cloudinaryUrl=cdnData.secure_url;
+        console.log('[DEV] Firebase bloqueado — NÃO gravado:', p.name, cdnData.secure_url);
+        done++;
+      }catch(err){
+        errors++; toastMsg('Erro Cloudinary em "'+(p.name||'produto')+'": '+err.message);
+      }
+    }
+    loteSetProgress(active.length,active.length,'Fotos enviadas · Firebase bloqueado');
+    if(btn) btn.disabled=false;
+    document.getElementById('loteSuccessTitle').textContent='Fotos enviadas!';
+    document.getElementById('loteSuccessMsg').textContent=done+' foto(s) no Cloudinary. Firebase bloqueado — nenhum produto foi cadastrado no banco.'+(errors?' '+errors+' erro(s).':'');
+    loteGoStep(4); toastMsg('⚙ Dev: '+done+' foto(s) enviadas, Firebase bloqueado'); return;
+  }
+
+  // Modo real
+  var cld=_loteGetCld();
+  if(!cld.cloud||!cld.preset){ toastMsg('Configure o Cloudinary na aba ⚙ Backup'); if(btn) btn.disabled=false; return; }
+
+  var done=0, errors=0;
+  for(var i=0;i<active.length;i++){
+    var p=active[i];
+    loteSetProgress(i,active.length,'Enviando '+(p.name||'produto')+'...');
+    try{
+      // 1. Cloudinary (usa wrapper que respeita dev mode)
+      var cdnData=await _cloudinaryUpload(cld.cloud,cld.preset,p.file,'tania-parfum');
+      p.cloudinaryUrl=cdnData.secure_url;
+      // 2. Firebase
+      var newId=Date.now()+i;
+      var payload={
+        id:newId, foto:cdnData.secure_url, name:p.name, brand:p.brand,
+        sub:p.sub, volume:p.volume, price:p.price?parseFloat(p.price):null,
+        badge:p.badge, category:p.category, catalogTab:p.section,
+        catalogTabs:[p.section], custom:true, ativo:true,
+        createdAt:new Date().toISOString()
+      };
+      if(window._fbdb && !_devMode){
+        await window._fbdb.ref('produtos_estaticos/'+newId).set(payload);
+        if(p.price) await window._fbdb.ref('precos/'+newId).set(parseFloat(p.price));
+      }
+      done++;
+    }catch(err){
+      errors++; toastMsg('Erro em "'+(p.name||'produto')+'": '+err.message);
+    }
+  }
+  loteSetProgress(active.length,active.length,'Concluído!');
+  if(btn) btn.disabled=false;
+  document.getElementById('loteSuccessTitle').textContent='Publicado!';
+  document.getElementById('loteSuccessMsg').textContent=done+' produto(s) adicionado(s) ao catálogo.'+(errors?' '+errors+' com erro.':'');
+  loteGoStep(4); toastMsg(done+' produto(s) publicado(s) 🌸');
+}
+
+function loteSetProgress(done,total,label){
+  var pct=total?Math.round(done/total*100):0;
+  var f=document.getElementById('loteProgressFill'); if(f) f.style.width=pct+'%';
+  var p=document.getElementById('loteProgressPct');  if(p) p.textContent=pct+'%';
+  var l=document.getElementById('loteProgressLabel');if(l) l.textContent=label;
+}
+
+function loteReset(){
+  _loteProducts.forEach(function(p){if(p.previewUrl)URL.revokeObjectURL(p.previewUrl);});
+  _loteProducts=[];
+  var grid=document.getElementById('lotePreviewGrid'); if(grid) grid.innerHTML='';
+  loteGoStep(1);
 }
 
 function iniciarFirebase(){
