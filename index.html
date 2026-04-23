@@ -4125,11 +4125,11 @@ renderPag();
 
 <!-- Firebase SDK (carrega por último para não bloquear o app) -->
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
 // ── AUTENTICAÇÃO GOOGLE ────────────────────────────────────────────────────
@@ -4146,7 +4146,26 @@ function _mostrarLogin(msg,erro){
 }
 
 function loginGoogle(){
-  if(!_fbAuth){_mostrarLogin('Firebase ainda carregando, aguarde...',true);return;}
+  // Se Firebase ainda não carregou, tenta até 10s antes de desistir
+  if(!_fbAuth){
+    _mostrarLogin('Carregando Firebase, aguarde...');
+    var tries=0;
+    var wait=setInterval(function(){
+      tries++;
+      if(_fbAuth){
+        clearInterval(wait);
+        _fazerLoginGoogle();
+      } else if(tries>=50){ // 50 × 200ms = 10s
+        clearInterval(wait);
+        _mostrarLogin('⚠ Firebase não carregou. Verifique sua conexão.',true);
+      }
+    },200);
+    return;
+  }
+  _fazerLoginGoogle();
+}
+
+function _fazerLoginGoogle(){
   _mostrarLogin('Abrindo login do Google...');
   var provider=new firebase.auth.GoogleAuthProvider();
   _fbAuth.signInWithPopup(provider).catch(function(err){
@@ -4887,7 +4906,7 @@ if(typeof setFbStatus===“function”) setFbStatus(false,“Firebase SDK nao ca
 var ls=document.getElementById(‘login-screen’);
 if(ls){ls.classList.add(‘hide’);setTimeout(function(){ls.style.display=‘none’;},400);}
 }
-})(40);
+})(50);
 </script>
 
 </body>
