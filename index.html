@@ -4439,8 +4439,9 @@ async function loteAnalyzeOne(product, mode){
   }
 
   var prompt = mode==='desc'
-    ? 'Foto de produto de perfumaria/beleza. Responda APENAS com JSON puro sem markdown: {"sub":"descrição elegante em português, máx 12 palavras"}'
-    : 'Foto de produto de perfumaria ou beleza. Responda SOMENTE com JSON válido sem markdown, sem texto antes ou depois:\n{"brand":"marca do item principal","name":"ver regra abaixo","sub":"ver regra abaixo","volume":"volume se visível ex 75ml ou vazio","badge":"Novo ou Oferta ou vazio","category":"feminino|masculino|kit|hidratante|kids","section":"todos|colecao|maes|beleza"}\n\nREGRA nome: produto único → nome comercial sem volume/tipo. Kit montado → nome ELEGANTE e SOFISTICADO em português brasileiro de 2-3 palavras, como título de coleção de perfumaria de luxo. Use vocabulário refinado, sensorial e poético — substantivos nobres + adjetivos de atmosfera. Exemplos do estilo desejado: Seda Dourada, Noite de Veludo, Brilho Eterno, Aura Sublime, Pétala Rara, Essência Pura, Véu de Rosas, Mistério Dourado. Inspire-se nas sensações, cores e aromas visíveis na foto. Evite palavras genéricas como Kit, Presente, Mimo, Surpresa, Carinho, Especial.\nREGRA sub: produto único → tipo e volume (ex: Deo Parfum 90ml). Kit montado → liste os itens visíveis de forma elegante.\nREGRA section: todos=padrão, colecao=lançamento/premium, maes=tema Dia das Mães, beleza=cuidados/kids.\nREGRA category: kit se tiver 2+ itens, hidratante se tiver creme/loção/body splash.';
+    ? 'Produto de perfumaria ou beleza na foto. JSON puro sem markdown: {"sub":"descrição em português, máx 10 palavras"}'
+    : 'Produto de perfumaria ou beleza na foto. Responda SOMENTE com este JSON, sem texto extra:\n{"brand":"marca","name":"nome comercial do produto","sub":"tipo e volume juntos ex: Deo Parfum 90ml ou Eau de Parfum 75ml","badge":"Novo ou Oferta ou vazio","category":"feminino ou masculino ou kit ou hidratante ou kids","section":"todos ou colecao ou maes ou beleza","isKit":"sim ou nao"}';
+  var modelo = localStorage.getItem('bela-gemini-modelo') || 'gemini-2.5-flash';
   var modelo = localStorage.getItem('bela-gemini-modelo') || 'gemini-2.5-flash';
 
   var resp, data, lastErr = '';
@@ -4480,10 +4481,29 @@ async function loteAnalyzeOne(product, mode){
     if(r.brand && !product.brand) product.brand = r.brand;
     if(r.name  && !product.name)  product.name  = r.name;
     if(r.sub)   product.sub   = r.sub;
-    if(r.volume && !product.volume) product.volume = r.volume;
     if(r.badge) product.badge = r.badge;
     if(r.category) product.category = r.category;
     if(r.section)  product.section  = r.section;
+
+    // Se for kit montado, faz segunda chamada só para criar nome elegante
+    var isKit = r.isKit === 'sim' || (r.category && r.category.indexOf('kit') >= 0);
+    if (isKit && mode !== 'desc') {
+      try {
+        var kitPrompt = 'Kit de perfumaria/beleza na foto. Crie um nome elegante e sofisticado em português brasileiro, 2 a 3 palavras, estilo coleção de luxo. Use substantivos nobres + adjetivos de atmosfera. Exemplos: Seda Dourada, Noite de Veludo, Aura Sublime, Pétala Rara, Véu de Rosas, Mistério Dourado, Essência Pura, Brilho Eterno. Inspire-se nas cores, aromas e embalagens visíveis. Responda SOMENTE com JSON: {"name":"Nome Elegante Aqui"}';
+        var kitResp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+modelo+':generateContent?key='+GEMINI_KEY, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ contents:[{parts:[{inline_data:{mime_type:mt,data:b64}},{text:kitPrompt}]}], generationConfig:{temperature:0.7,maxOutputTokens:64} })
+        });
+        var kitData = await kitResp.json();
+        var kitRaw = '';
+        try{ kitRaw = kitData.candidates[0].content.parts[0].text; }catch(e){}
+        kitRaw = kitRaw.replace(/```json|```/g,'').trim();
+        var ks = kitRaw.indexOf('{'), ke = kitRaw.lastIndexOf('}');
+        if(ks>=0&&ke>ks) kitRaw = kitRaw.substring(ks,ke+1);
+        var kitResult = JSON.parse(kitRaw);
+        if(kitResult.name) product.name = kitResult.name;
+      } catch(e) { /* mantém nome original se falhar */ }
+    }
     product.status = 'ready';
     product.errorMsg = '';
   } catch(e) {
