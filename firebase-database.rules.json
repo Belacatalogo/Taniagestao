@@ -1,0 +1,41 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "produtos_estaticos": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+
+    "produtos_custom": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+
+    "precos": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+
+    "esgotados": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+
+    "carrossel": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+
+    "config": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+
+    "backup": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    }
+  }
+}
